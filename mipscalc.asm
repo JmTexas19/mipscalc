@@ -150,13 +150,43 @@ subNumb:
 	
 #Multiplies 2 inputs
 multNumb:
+	#LOAD WORDS
+	lw		$t0, ($a0)			#Load word of address $a0 into $t0
+	lw		$t1, ($a1)			#Load word of address $a1 into $t1
+	
+	#CHECK BIT
+	loopMult:
+		andi	$t2, $t1, 1		#Check if bit is set; #t2 bit_check
+		beqz	$t2, clearBit		#Branch if bit is set
+		addu	$t3, $t3, $t0		#Add dec2 to result if bit is clear; #t3 result
 
-	jr		$ra				#Return to main
+	#MULTIPLY AND SHIFT
+	clearBit:
+		sll	$t0, $t0, 1		#Shift dec1 left one bit to multiply by power of 2
+		srl	$t1, $t1, 1		#Shift dec2 right one bit to check next bit
+		bnez	$t1, loopMult		#If dec2 is not equal to zero, loop again, otherwise done
+		sw 	$t3, ($a2)		#Store result into label
+		jr	$ra			#Return to main
 	
 #Divides 2 inputs
 divNumb:
+	#LOAD WORDS
+	lw		$t0, ($a0)			#Load word of address $a0 into $t0
+	lw		$t1, ($a1)			#Load word of address $a1 into $t1
+	
+	#CHECK BIT
+	loopDiv:
+		andi	$t2, $t1, 1		#Check if bit is set; #t2 bit_check
+		beqz	$t2, clearBit		#Branch if bit is set
+		addu	$t3, $t3, $t0		#Add dec2 to result if bit is clear; #t3 result
 
-	jr		$ra				#Return to main
+	#MULTIPLY AND SHIFT
+	clearBit:
+		srl	$t0, $t0, 1		#Shift dec1 left one bit to multiply by power of 2
+		sll	$t1, $t1, 1		#Shift dec2 right one bit to check next bit
+		bnez	$t1, loopDiv		#If dec2 is not equal to zero, loop again, otherwise done
+		sw 	$t3, ($a2)		#Store result into label
+		jr	$ra			#Return to main
 	
 #Displays result of operation
 displayNumb:
