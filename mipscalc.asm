@@ -157,11 +157,11 @@ multNumb:
 	#CHECK BIT
 	loopMult:
 		andi	$t2, $t1, 1		#Check if bit is set; #t2 bit_check
-		beqz	$t2, clearBit		#Branch if bit is set
+		beqz	$t2, clearBitMult	#Branch if bit is set
 		addu	$t3, $t3, $t0		#Add dec2 to result if bit is clear; #t3 result
 
 	#MULTIPLY AND SHIFT
-	clearBit:
+	clearBitMult:
 		sll	$t0, $t0, 1		#Shift dec1 left one bit to multiply by power of 2
 		srl	$t1, $t1, 1		#Shift dec2 right one bit to check next bit
 		bnez	$t1, loopMult		#If dec2 is not equal to zero, loop again, otherwise done
@@ -177,11 +177,11 @@ divNumb:
 	#CHECK BIT
 	loopDiv:
 		andi	$t2, $t1, 1		#Check if bit is set; #t2 bit_check
-		beqz	$t2, clearBit		#Branch if bit is set
+		beqz	$t2, clearBitDiv	#Branch if bit is set
 		addu	$t3, $t3, $t0		#Add dec2 to result if bit is clear; #t3 result
 
 	#MULTIPLY AND SHIFT
-	clearBit:
+	clearBitDiv:
 		srl	$t0, $t0, 1		#Shift dec1 left one bit to multiply by power of 2
 		sll	$t1, $t1, 1		#Shift dec2 right one bit to check next bit
 		bnez	$t1, loopDiv		#If dec2 is not equal to zero, loop again, otherwise done
