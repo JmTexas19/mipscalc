@@ -9,23 +9,37 @@
 	output:			.word 0
 	
 	#Strings
-	inputString1:		.asciiz 		"Enter first value:"
-	inputString2:		.asciiz 		"Enter second value"
-	inputOperator:		.asciiz 		"Enter operator"
+	inputString1:		.asciiz 		"Enter first value:\n"
+	inputString2:		.asciiz 		"Enter second value:\n"
+	inputOperator:		.asciiz 		"Enter operator:\n"
 .text
-	#MAIN
-	
-	#Print String 1
+#MAIN
+main:
+	#GETINPUT
 	la		$a0, inputString1		#Load pointer inputString1 into $a0
-	jal 		printInputStr1			#Jump to procedure printInputStr1
+	la		$a1, input1			#Load pointer input1 into $a1
+	jal 		getInput			#Jump to procedure printInputStr1
 	
-	#Exit
-	li		$v0, 17				#Load print string syscall
+	#EXIT
+	li		$v0, 17				#Load exit syscall
 	syscall						#Execute
 	
-printInputStr1:
+#Prints inputString1 and reads input from user
+getInput:
+	#PRINT STRING
 	li		$v0, 4				#Load print string syscall
 	syscall						#Execute
+	
+	#READ INPUT
+	li		$v0, 5				#Load get integer syscall
+	syscall						#Execute
+	sw		$v0, 0($a1)			#Store input in label input1
+	
 	jr		$ra				#Return to main
+
+#Accepts and stores first value
+readInput1:
+	li		$v0, 5				#Load get integer syscall
+	syscall						#Execute
 
 	
