@@ -37,7 +37,7 @@ main:
 	jal 		getInput			#Jump to procedure printInputStr1
 
 	#OPERATOR BRANCH
-	beq		$v1, 43, addNumb		#Branch if $v1 is a '+' operator
+	beq		$v1, 43, addNumbJump		#Branch if $v1 is a '+' operator
 	beq		$v1, 45, subNumb		#Branch if $v1 is a '-' operator
 	beq		$v1, 42, multNumb		#Branch if $v1 is a '*' operator
 	beq		$v1, 47, divNumb		#Branch if $v1 is a '/' operator
@@ -48,6 +48,33 @@ main:
 	syscall						#Execute
 	j		main				#Loop to start of program
 	
+	#Jump and link to addNumb (This is done so that we can return and continue from the procedures since branch doesn't link.)
+	addNumbJump:
+	jal		addNumb
+	j 		continue			#Jump to continue program
+	
+	#Jump and link to subNumb
+	subNumbJump:
+	jal		subNumb
+	j 		continue			#Jump to continue program
+	
+	#Jump and link to multNumb
+	multNumbJump:
+	jal		multNumb
+	j 		continue			#Jump to continue program
+	
+	#Jump and link to divNumb
+	divNumbJump:
+	jal		divNumb
+	j 		continue			#Jump to continue program
+	
+	#Continue after operations is done
+	continue:
+	
+	#EXIT
+	li		$v0, 17
+	syscall
+	
 #Prints inputString1 and reads input from user
 getInput:
 	#PRINT STRING
@@ -57,7 +84,7 @@ getInput:
 	#READ INPUT
 	li		$v0, 5				#Load read integer syscall
 	syscall						#Execute
-	sw		$v0, 0($a1)			#Store value at address $a1 into label
+	sw		$v0, ($a1)			#Store value at address $a1 into label
 	
 	jr		$ra				#Return to main
 
@@ -77,17 +104,17 @@ getOperator:
 #Adds 2 inputs
 addNumb:
 
-	j		main				#Loop to start of program
+	jr		$ra				#Return to main
 #Subtracts 2 inputs
 subNumb:
 
-	j		main				#Loop to start of program
+	jr		$ra				#Return to main
 #Multiplies 2 inputs
 multNumb:
 
-	j		main				#Loop to start of program
+	jr		$ra				#Return to main
 #Divides 2 inputs
 divNumb:
 
-	j		main				#Loop to start of program
+	jr		$ra				#Return to main
 	
