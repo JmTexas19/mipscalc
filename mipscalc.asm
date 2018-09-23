@@ -6,7 +6,7 @@
 	#Variables
 	input1:			.word 0
 	input2:			.word 0
-	output:			.word 0
+	result:			.word 0
 	
 	#Strings
 	inputString1:		.asciiz 		"Enter first value:\n"
@@ -38,9 +38,9 @@ main:
 
 	#OPERATOR BRANCH
 	beq		$v1, 43, addNumbJump		#Branch if $v1 is a '+' operator
-	beq		$v1, 45, subNumb		#Branch if $v1 is a '-' operator
-	beq		$v1, 42, multNumb		#Branch if $v1 is a '*' operator
-	beq		$v1, 47, divNumb		#Branch if $v1 is a '/' operator
+	beq		$v1, 45, subNumbJump		#Branch if $v1 is a '-' operator
+	beq		$v1, 42, multNumbJump		#Branch if $v1 is a '*' operator
+	beq		$v1, 47, divNumbJump		#Branch if $v1 is a '/' operator
 
 	#INVALID OPERATOR 
 	li		$v0, 4				#Load exit syscall
@@ -50,25 +50,37 @@ main:
 	
 	#Jump and link to addNumb (This is done so that we can return and continue from the procedures since branch doesn't link.)
 	addNumbJump:
-	jal		addNumb
+	la		$a0, input1			#Load address of input1 into $a0
+	la		$a1, input2			#Load address of input2 into $a1
+	la		$a2, result			#Load address of result into $a2
+	jal		addNumb				#Jump and link to addNumb
 	j 		continue			#Jump to continue program
 	
 	#Jump and link to subNumb
 	subNumbJump:
-	jal		subNumb
+	la		$a0, input1			#Load address of input1 into $a0
+	la		$a1, input2			#Load address of input2 into $a1
+	la		$a2, result			#Load address of result into $a2
+	jal		subNumb				#Jump and link to subNumb
 	j 		continue			#Jump to continue program
 	
 	#Jump and link to multNumb
 	multNumbJump:
-	jal		multNumb
+	la		$a0, input1			#Load address of input1 into $a0
+	la		$a1, input2			#Load address of input2 into $a1
+	la		$a2, result			#Load address of result into $a2
+	jal		multNumb			#Jump and link to multNumb
 	j 		continue			#Jump to continue program
 	
 	#Jump and link to divNumb
 	divNumbJump:
-	jal		divNumb
+	la		$a0, input1			#Load address of input1 into $a0
+	la		$a1, input2			#Load address of input2 into $a1
+	la		$a2, result			#Load address of result into $a2
+	jal		divNumb				#Jump and link to divNumb
 	j 		continue			#Jump to continue program
 	
-	#Continue after operations is done
+	#Continue after operation is done
 	continue:
 	
 	#EXIT
@@ -103,7 +115,12 @@ getOperator:
 	
 #Adds 2 inputs
 addNumb:
-
+	lw		$t0, ($a0)			#Load word of address $a0 into $t0
+	lw		$t1, ($a1)			#Load word of address $a1 into $t1
+		
+	add		$t2, $t0, $t1			#Add two inputs together
+	sw		$t2, ($a2)			#Store in pointer of $a2
+	
 	jr		$ra				#Return to main
 #Subtracts 2 inputs
 subNumb:
@@ -117,4 +134,5 @@ multNumb:
 divNumb:
 
 	jr		$ra				#Return to main
+	
 	
