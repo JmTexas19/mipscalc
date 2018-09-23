@@ -12,6 +12,7 @@
 	inputString1:		.asciiz 		"Enter first value:\n"
 	inputString2:		.asciiz 		"Enter second value:\n"
 	inputOperatorStr:	.asciiz 		"Enter operator:\n"
+	invalidOperatorStr:	.asciiz			"Invalid operator entered, please try again...\n"
 .text
 #MAIN
 main:
@@ -41,9 +42,11 @@ main:
 	beq		$v1, 42, multNumb		#Branch if $v1 is a '*' operator
 	beq		$v1, 47, divNumb		#Branch if $v1 is a '/' operator
 
-	#EXIT
-	li		$v0, 17				#Load exit syscall
+	#INVALID OPERATOR 
+	li		$v0, 4				#Load exit syscall
+	la		$a0, invalidOperatorStr		#Load address for invalid operator string
 	syscall						#Execute
+	j		main				#Loop to start of program
 	
 #Prints inputString1 and reads input from user
 getInput:
@@ -74,13 +77,17 @@ getOperator:
 #Adds 2 inputs
 addNumb:
 
+	j		main				#Loop to start of program
 #Subtracts 2 inputs
 subNumb:
 
+	j		main				#Loop to start of program
 #Multiplies 2 inputs
 multNumb:
 
+	j		main				#Loop to start of program
 #Divides 2 inputs
 divNumb:
 
+	j		main				#Loop to start of program
 	
