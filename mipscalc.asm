@@ -126,9 +126,11 @@ getOperator:
 	
 #Adds 2 inputs
 addNumb:
+	#LOAD WORDS
 	lw		$t0, ($a0)			#Load word of address $a0 into $t0
 	lw		$t1, ($a1)			#Load word of address $a1 into $t1
 		
+	#ADD INPUTS
 	add		$t2, $t0, $t1			#Add two inputs together
 	sw		$t2, ($a2)			#Store in pointer of $a2
 	
@@ -136,6 +138,13 @@ addNumb:
 	
 #Subtracts 2 inputs
 subNumb:
+	#LOAD WORDS
+	lw		$t0, ($a0)			#Load word of address $a0 into $t0
+	lw		$t1, ($a1)			#Load word of address $a1 into $t1
+		
+	#SUBTRACT INPUTS
+	sub		$t2, $t0, $t1			#Add two inputs together
+	sw		$t2, ($a2)			#Store in pointer of $a2
 
 	jr		$ra				#Return to main
 	
@@ -151,7 +160,7 @@ divNumb:
 	
 #Displays result of operation
 displayNumb:
-	#Load words
+	#LOAD WORDS
 	lw		$t0, ($a0)			#Load input1 value into #t0
 	lw		$t1, ($a1)			#Load input2 value into #t1
 	lw		$t2, ($a2)			#Load operator asciiz value into #t2
