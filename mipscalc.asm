@@ -37,9 +37,4 @@ getInput:
 	
 	jr		$ra				#Return to main
 
-#Accepts and stores first value
-readInput1:
-	li		$v0, 5				#Load get integer syscall
-	syscall						#Execute
-
 	
