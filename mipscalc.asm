@@ -4,14 +4,14 @@
 
 .data
 	#Variables
-	input1:			.word 0
-	input2:			.word 0
-	output:			.word 0
+	input1:			.word 
+	input2:			.word 
+	output:			.word 
 	
 	#Strings
 	inputString1:		.asciiz 		"Enter first value:\n"
 	inputString2:		.asciiz 		"Enter second value:\n"
-	inputOperator:		.asciiz 		"Enter operator:\n"
+	inputOperatorStr:	.asciiz 		"Enter operator:\n"
 .text
 #MAIN
 main:
@@ -19,6 +19,11 @@ main:
 	la		$a0, inputString1		#Load pointer inputString1 into $a0
 	la		$a1, input1			#Load pointer input1 into $a1
 	jal 		getInput			#Jump to procedure printInputStr1
+	
+	#GET OPERATOR
+	la		$a0, inputOperatorStr		#Load pointer inputOperatorStr into $a0
+	la		$a1, inputOperatorStr		#Load pointer operator into $a1
+	jal		getOperator
 	
 	#EXIT
 	li		$v0, 17				#Load exit syscall
@@ -31,9 +36,22 @@ getInput:
 	syscall						#Execute
 	
 	#READ INPUT
-	li		$v0, 5				#Load get integer syscall
+	li		$v0, 5				#Load read integer syscall
 	syscall						#Execute
 	sw		$v0, 0($a1)			#Store input in label input1
+	
+	jr		$ra				#Return to main
+
+#Prints inputOperatorStr and reads character for operations
+getOperator:
+	#PRINT STRING
+	li		$v0, 4				#Load print string syscall
+	syscall						#Execute
+	
+	#READ INPUT
+	li		$v0, 12				#Load read character syscall
+	syscall						#Execute
+	move		$v1, $v0			#Return operator character in $v1
 	
 	jr		$ra				#Return to main
 
