@@ -4,9 +4,9 @@
 
 .data
 	#Variables
-	input1:			.word 
-	input2:			.word 
-	output:			.word 
+	input1:			.word 0
+	input2:			.word 0
+	output:			.word 0
 	
 	#Strings
 	inputString1:		.asciiz 		"Enter first value:\n"
@@ -31,9 +31,17 @@ main:
 	syscall						#Execute
 	
 	#GETINPUT2
-	la		$a0, inputString2		#Load pointer inputString1 into $a0
-	la		$a1, input2			#Load pointer input1 into $a1
+	la		$a0, inputString2		#Load pointer inputString2 into $a0
+	la		$a1, input2			#Load pointer input2 into $a1
 	jal 		getInput			#Jump to procedure printInputStr1
+	
+	li		$v0, 1
+	lw		$a0, input1			#Load print string syscall
+	syscall						#Execute
+	
+	li		$v0, 1
+	lw		$a0, input2			#Load print string syscall
+	syscall						#Execute
 	
 	#EXIT
 	li		$v0, 17				#Load exit syscall
@@ -48,7 +56,7 @@ getInput:
 	#READ INPUT
 	li		$v0, 5				#Load read integer syscall
 	syscall						#Execute
-	sw		$v0, 0($a1)			#Store input in label input1
+	sw		$v0, 0($a1)			#Store value at address $a1 into label
 	
 	jr		$ra				#Return to main
 
