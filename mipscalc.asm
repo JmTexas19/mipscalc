@@ -7,6 +7,7 @@
 	input1:			.word 0
 	input2:			.word 0
 	result:			.word 0
+	operator:		.word 0
 	
 	#Strings
 	inputString1:		.asciiz 		"Enter first value:\n"
@@ -23,7 +24,7 @@ main:
 	
 	#GET OPERATOR
 	la		$a0, inputOperatorStr		#Load pointer inputOperatorStr into $a0
-	la		$a1, inputOperatorStr		#Load pointer operator into $a1
+	la		$a1, operator			#Load pointer operator into $a1
 	jal		getOperator
 	
 	#FORMATTING NEWLINE
@@ -83,6 +84,10 @@ main:
 	#Continue after operation is done
 	continue:
 	
+	#DISPLAY RESULT
+	la		$a0, result
+	jal		displayNumb
+	
 	#EXIT
 	li		$v0, 17
 	syscall
@@ -110,6 +115,7 @@ getOperator:
 	li		$v0, 12				#Load read character syscall
 	syscall						#Execute
 	move		$v1, $v0			#Return operator character in $v1
+	sw		$v1, ($a1)			#Store asciiz number into label
 	
 	jr		$ra				#Return to main
 	
@@ -122,17 +128,24 @@ addNumb:
 	sw		$t2, ($a2)			#Store in pointer of $a2
 	
 	jr		$ra				#Return to main
+	
 #Subtracts 2 inputs
 subNumb:
 
 	jr		$ra				#Return to main
+	
 #Multiplies 2 inputs
 multNumb:
 
 	jr		$ra				#Return to main
+	
 #Divides 2 inputs
 divNumb:
 
 	jr		$ra				#Return to main
+	
+#Displays result of operation
+displayNumb:
+
 	
 	
