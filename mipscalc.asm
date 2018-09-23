@@ -10,10 +10,10 @@
 	operator:		.word 0
 	
 	#Strings
-	inputString1:		.asciiz 		"Enter first value:\n"
-	inputString2:		.asciiz 		"Enter second value:\n"
-	inputOperatorStr:	.asciiz 		"Enter operator:\n"
-	invalidOperatorStr:	.asciiz			"Invalid operator entered, please try again...\n"
+	inputString1:		.asciiz "Enter first value:\n"
+	inputString2:		.asciiz "Enter second value:\n"
+	inputOperatorStr:	.asciiz "Enter operator:\n"
+	invalidOperatorStr:	.asciiz	"Invalid operator entered, please try again...\n"
 .text
 #MAIN
 main:
@@ -85,8 +85,13 @@ main:
 	continue:
 	
 	#DISPLAY RESULT
-	la		$a0, result
-	jal		displayNumb
+	la		$a0, input1			#Load address of input1 into $a0
+	la		$a1, input2			#Load address of input2 into $a1
+	la		$a2, operator			#Load address of operator into $a2
+	la		$a3, result			#Load address of result into $a3
+
+	
+	jal		displayNumb			#Jump and link to displayNumb
 	
 	#EXIT
 	li		$v0, 17
@@ -146,6 +151,58 @@ divNumb:
 	
 #Displays result of operation
 displayNumb:
+	#Load words
+	lw		$t0, ($a0)			#Load input1 value into #t0
+	lw		$t1, ($a1)			#Load input2 value into #t1
+	lw		$t2, ($a2)			#Load operator asciiz value into #t2
+	lw		$t3, ($a3)			#Load result value into #t3
 
+	
+	#Print input1
+	li		$v0, 1				#Load syscall for print integer
+	move		$a0, $t0			#Copy input1 value into $a0 for printing
+	syscall						#Print integer in $a0(input1)
+	
+	#Print space
+	li		$v0, 11				#Load syscall for print integer
+	addi		$a0, $0, 0x20			#Load ascii for space into $a0
+	syscall						#Execute
+	
+	#Print operator
+	li		$v0, 11				#Load syscall for print integer
+	add 		$a0, $0, $t2			#Load ascii for operator into $a0
+	syscall						#Execute
+	
+	#Print space
+	li		$v0, 11				#Load syscall for print integer
+	addi		$a0, $0, 0x20			#Load ascii for space into $a0
+	syscall						#Execute
+	
+	#Print input2
+	li		$v0, 1				#Load syscall for print integer
+	move		$a0, $t1			#Copy input2 value into $a0 for printing
+	syscall						#Execute
+	
+	#Print space
+	li		$v0, 11				#Load syscall for print integer
+	addi		$a0, $0, 0x20			#Load ascii for space into $a0
+	syscall						#Execute
+	
+	#Print equal sign
+	li		$v0, 11				#Load syscall for print integer
+	addi		$a0, $0, 0x3D			#Load ascii for space into $a0
+	syscall						#Execute
+	
+	#Print space
+	li		$v0, 11				#Load syscall for print integer
+	addi		$a0, $0, 0x20			#Load ascii for space into $a0
+	syscall						#Execute
+	
+	#Print result
+	li		$v0, 1				#Load syscall for print integer
+	move		$a0, $t3			#Copy input2 value into $a0 for printing
+	syscall						#Execute
+	
+	
 	
 	
