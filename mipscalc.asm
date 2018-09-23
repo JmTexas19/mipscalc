@@ -27,7 +27,7 @@ main:
 	la		$a1, operator			#Load pointer operator into $a1
 	jal		getOperator
 	
-	#FORMATTING NEWLINE
+	#PRINT NEWLINE
 	li		$v0, 11				#Load print character syscall
 	addi		$a0, $0, 0xA			#Load ascii character for newline into $a0
 	syscall						#Execute
@@ -158,50 +158,59 @@ displayNumb:
 	lw		$t3, ($a3)			#Load result value into #t3
 
 	
-	#Print input1
+	#PRINT INPUT1
 	li		$v0, 1				#Load syscall for print integer
 	move		$a0, $t0			#Copy input1 value into $a0 for printing
 	syscall						#Print integer in $a0(input1)
 	
-	#Print space
+	#PRINT SPACE
 	li		$v0, 11				#Load syscall for print integer
 	addi		$a0, $0, 0x20			#Load ascii for space into $a0
 	syscall						#Execute
 	
-	#Print operator
+	#PRINT OPERATOR
 	li		$v0, 11				#Load syscall for print integer
 	add 		$a0, $0, $t2			#Load ascii for operator into $a0
 	syscall						#Execute
 	
-	#Print space
+	#PRINT SPACE
 	li		$v0, 11				#Load syscall for print integer
 	addi		$a0, $0, 0x20			#Load ascii for space into $a0
 	syscall						#Execute
 	
-	#Print input2
+	#PRINT INPUT2
 	li		$v0, 1				#Load syscall for print integer
 	move		$a0, $t1			#Copy input2 value into $a0 for printing
 	syscall						#Execute
 	
-	#Print space
+	#PRINT SPACE
 	li		$v0, 11				#Load syscall for print integer
 	addi		$a0, $0, 0x20			#Load ascii for space into $a0
 	syscall						#Execute
 	
-	#Print equal sign
+	#PRINT EQUAL SIGN
 	li		$v0, 11				#Load syscall for print integer
 	addi		$a0, $0, 0x3D			#Load ascii for space into $a0
 	syscall						#Execute
 	
-	#Print space
+	#PRINT SPACE
 	li		$v0, 11				#Load syscall for print integer
 	addi		$a0, $0, 0x20			#Load ascii for space into $a0
 	syscall						#Execute
 	
-	#Print result
+	#PRINT RESULT
 	li		$v0, 1				#Load syscall for print integer
 	move		$a0, $t3			#Copy input2 value into $a0 for printing
 	syscall						#Execute
+	
+	#PRINT NEWLINE
+	li		$v0, 11				#Load print character syscall
+	addi		$a0, $0, 0xA			#Load ascii character for newline into $a0
+	syscall	
+	
+	jr		$ra				#Return to main
+	
+	
 	
 	
 	
