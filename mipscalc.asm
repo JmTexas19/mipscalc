@@ -34,15 +34,13 @@ main:
 	la		$a0, inputString2		#Load pointer inputString2 into $a0
 	la		$a1, input2			#Load pointer input2 into $a1
 	jal 		getInput			#Jump to procedure printInputStr1
-	
-	li		$v0, 1
-	lw		$a0, input1			#Load print string syscall
-	syscall						#Execute
-	
-	li		$v0, 1
-	lw		$a0, input2			#Load print string syscall
-	syscall						#Execute
-	
+
+	#OPERATOR BRANCH
+	beq		$v1, 43, addNumb		#Branch if $v1 is a '+' operator
+	beq		$v1, 45, subNumb		#Branch if $v1 is a '-' operator
+	beq		$v1, 42, multNumb		#Branch if $v1 is a '*' operator
+	beq		$v1, 47, divNumb		#Branch if $v1 is a '/' operator
+
 	#EXIT
 	li		$v0, 17				#Load exit syscall
 	syscall						#Execute
@@ -72,5 +70,17 @@ getOperator:
 	move		$v1, $v0			#Return operator character in $v1
 	
 	jr		$ra				#Return to main
+	
+#Adds 2 inputs
+addNumb:
+
+#Subtracts 2 inputs
+subNumb:
+
+#Multiplies 2 inputs
+multNumb:
+
+#Divides 2 inputs
+divNumb:
 
 	
