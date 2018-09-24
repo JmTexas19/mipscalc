@@ -109,7 +109,9 @@ main:
 	li		$v0, 1				#Load print character syscall
 	syscall						#Execute
 	
+	#If not division, remainder is skipped
 	skipRemainder:
+	
 	#PRINT NEWLINE
 	li		$v0, 11				#Load print character syscall
 	addi		$a0, $0, 0xA			#Load ascii character for newline into $a0
