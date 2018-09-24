@@ -15,7 +15,7 @@
 	inputString2:		.asciiz "Enter second value:\n"
 	inputOperatorStr:	.asciiz "Enter operator:\n"
 	invalidOperatorStr:	.asciiz	"Invalid operator entered, please try again...\n"
-	divisionByZeroStr:		.asciiz "Can't divide by 0, please try again...\n"
+	divisionByZeroStr:	.asciiz "Can't divide by 0, please try again...\n"
 	remainderString:	.asciiz "Remainder: "
 .text
 #MAIN
@@ -115,8 +115,15 @@ main:
 	addi		$a0, $0, 0xA			#Load ascii character for newline into $a0
 	syscall	
 	
+	#CLEAR LABELS
+	sw		$0, input1			#Clear input1
+	sw		$0, input2			#Clear input2
+	sw		$0, result			#Clear result
+	sw		$0, operator			#Clear operator
+	sw		$0, remainder		#Clear remainder
+	
 	#LOOP
-	j		main
+	j		main				#Loop to beginning of program
 	
 	#DIVISION BY ZERO
 	divisionByZero:
@@ -157,6 +164,7 @@ addNumb:
 	#LOAD WORDS
 	lw		$t0, ($a0)			#Load word of address $a0 into $t0
 	lw		$t1, ($a1)			#Load word of address $a1 into $t1
+	lw		$t2, ($a2)			#Load word of address $a1 into $t1
 		
 	#ADD INPUTS
 	add		$t2, $t0, $t1			#Add two inputs together
@@ -169,6 +177,7 @@ subNumb:
 	#LOAD WORDS
 	lw		$t0, ($a0)			#Load word of address $a0 into $t0
 	lw		$t1, ($a1)			#Load word of address $a1 into $t1
+	lw		$t2, ($a2)			#Load word of address $a1 into $t1
 		
 	#SUBTRACT INPUTS
 	sub		$t2, $t0, $t1			#Add two inputs together
@@ -181,6 +190,7 @@ multNumb:
 	#LOAD WORDS
 	lw		$t0, ($a0)			#Load word of address $a0 into $t0
 	lw		$t1, ($a1)			#Load word of address $a1 into $t1
+	lw		$t3, ($a2)			#Load word of address $a1 into $t1
 	
 	#CHECK BIT
 	loopMult:
