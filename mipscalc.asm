@@ -173,21 +173,41 @@ divNumb:
 	#LOAD WORDS
 	lw		$t0, ($a0)			#Load word of address $a0 into $t0
 	lw		$t1, ($a1)			#Load word of address $a1 into $t1
+	li		$t2, 0				#Running quotient
 	
-	#CHECK BIT
+	#CHECK IF DIVISION BY 0
+	bnez 		$t1, loopDiv 
+	
+	
+	#CHECK IF DIVIDEND IS GREATER THAN DIVISOR
 	loopDiv:
-		andi	$t2, $t1, 1		#Check if bit is set; #t2 bit_check
-		beqz	$t2, clearBitDiv	#Branch if bit is set
-		addu	$t3, $t3, $t0		#Add dec2 to result if bit is clear; #t3 result
+		bgt     $t0, $t1, beginDivision		#Branch if dividend is greater than divisor
+		bne  	$t0, $t1, Finish		#Branch if dividend is equal to divisor
+		addi	$t2, $t2, 1			#Add 1 due to dividend and divisors being equal
+		
+	Finish:
+		sw	$t2, ($a2)			#Store result into label
+		jr	$ra				#Return to main
 
-	#MULTIPLY AND SHIFT
-	clearBitDiv:
-		srl	$t0, $t0, 1		#Shift dec1 left one bit to multiply by power of 2
-		sll	$t1, $t1, 1		#Shift dec2 right one bit to check next bit
-		bnez	$t1, loopDiv		#If dec2 is not equal to zero, loop again, otherwise done
-		sw 	$t3, ($a2)		#Store result into label
-		jr	$ra			#Return to main
+	#SHIFT UNTIL DIVISOR IS BIGGER THAN DIVIDEND
+	beginDivision:
+		li	$t4, 1				#Set temp quotient to 1
+		move	$t3, $t1			#Copy divisor into temp divisor
+		sll	$t3, $t3, 1			#Shift temp divisor left 1 before going into loop
+		bgt 	$t0, $t3, divisionLoop		#Branch if dividend is greater than temp divisor
+		j	contDiv				#Else jump to contDiv
+		
+	divisionLoop:
+		sll	$t4, $t4, 1			#Shift left temp quotient by 1
+		sll	$t3, $t3, 1			#Shift left temp divisor by 1
+		bgt 	$t0, $t3, divisionLoop		#Shift until temp divisor is greater than dividend
 	
+	contDiv:
+		add	$t2, $t2, $t4			#Set running quotient = running quotient + temp quotient
+		srl	$t3, $t3, 1			#Undo temp divisors last shift
+		sub	$t0, $t0, $t3 			#Set dividend = dividend - temp divisor
+		j	loopDiv
+		
 #Displays result of operation
 displayNumb:
 	#LOAD WORDS
