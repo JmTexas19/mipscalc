@@ -16,6 +16,7 @@
 	inputOperatorStr:	.asciiz "Enter operator:\n"
 	invalidOperatorStr:	.asciiz	"Invalid operator entered, please try again...\n"
 	divisionByZeroStr:	.asciiz "Can't divide by 0, please try again...\n"
+	divisionByNegStr:	.asciiz "Negaive #'s not supported, please try again...\n"
 	remainderString:	.asciiz "Remainder: "
 .text
 #MAIN
@@ -134,7 +135,18 @@ main:
 	syscall						#Execute
 	j		main				#Loop Program
 	
-#Prints inputString1 and reads input from user
+	#DIVISION BY NEGATIVE
+	divisionByNeg:
+	li		$v0, 4				#Load print string syscall
+	la		$a0, divisionByNegStr		#Load in divisionByNegStr string
+	syscall						#Execute
+	j		main				#Loop Program
+	
+#Procedure:  GetInput
+#Displays a prompt to the user and then wait for a numerical input
+#The userÅfs input will get stored to the (word) address pointed by $a1
+#Input: $a0 points to the text string that will get displayed to the user
+#Input: $a1 points to a word address in .data memory, where to store the input number
 getInput:
 	#PRINT STRING
 	li		$v0, 4				#Load print string syscall
@@ -147,7 +159,10 @@ getInput:
 	
 	jr		$ra				#Return to main
 
-#Prints inputOperatorStr and reads character for operations
+#Procedure:  GetOperator
+#Displays a prompt to the user and then wait for a single character input
+#Input: $a0 points to the text string that will get displayed to the user
+#Returns the operator in $v1 (as an ascii character)
 getOperator:
 	#PRINT STRING
 	li		$v0, 4				#Load print string syscall
@@ -161,12 +176,16 @@ getOperator:
 	
 	jr		$ra				#Return to main
 	
-#Adds 2 inputs
+#Procedure:  AddNumb   0($a2) = 0($a0) + 0($a1)
+#Add two data values and store the result back to memory
+#Input: $a0 points to a word address in .data memory for the first data value
+#Input: $a1 points to a word address in .data memory for the second data value
+#Input: $a2 points to a word address in .data memory, where to store the result
 addNumb:
 	#LOAD WORDS
 	lw		$t0, ($a0)			#Load word of address $a0 into $t0
 	lw		$t1, ($a1)			#Load word of address $a1 into $t1
-	lw		$t2, ($a2)			#Load word of address $a1 into $t1
+	lw		$t2, ($a2)			#Load word of address $a2 into $t2
 		
 	#ADD INPUTS
 	add		$t2, $t0, $t1			#Add two inputs together
@@ -174,7 +193,11 @@ addNumb:
 	
 	jr		$ra				#Return to main
 	
-#Subtracts 2 inputs
+#Procedure:  SubNumb   0($a2) = 0($a0) - 0($a1)
+#Subtract two data values and store the result back to memory
+#Input: $a0 points to a word address in .data memory for the first data value
+#Input: $a1 points to a word address in .data memory for the second data value
+#Input: $a2 points to a word address in .data memory, where to store the result
 subNumb:
 	#LOAD WORDS
 	lw		$t0, ($a0)			#Load word of address $a0 into $t0
@@ -187,12 +210,16 @@ subNumb:
 
 	jr		$ra				#Return to main
 	
-#Multiplies 2 inputs
+#Procedure:  MultNumb   0($a2) = 0($a0) * 0($a1)
+#Multiply two data values and store the result back to memory
+#Input: $a0 points to a word address in .data memory for the first data value
+#Input: $a1 points to a word address in .data memory for the second data value
+#Input: $a2 points to a word address in .data memory, where to store the result
 multNumb:
 	#LOAD WORDS
 	lw		$t0, ($a0)			#Load word of address $a0 into $t0
 	lw		$t1, ($a1)			#Load word of address $a1 into $t1
-	lw		$t3, ($a2)			#Load word of address $a1 into $t1
+	lw		$t3, ($a2)			#Load word of address $a2 into $t3
 	
 	#CHECK BIT
 	loopMult:
@@ -208,7 +235,12 @@ multNumb:
 		sw 	$t3, ($a2)			#Store result into label
 		jr	$ra				#Return to main
 	
-#Divides 2 inputs
+#Procedure:  DivNumb   0($a2) = 0($a0) / 0($a1)   0($a3) = 0($a0) % 0($a1)
+#Divide two data values and store the result back to memory
+#Input: $a0 points to a word address in .data memory for the first data value
+#Input: $a1 points to a word address in .data memory for the second data value
+#Input: $a2 points to a word address in .data memory, where to store the quotient
+#Input: $a3 points to a word address in .data memory, where to store the remainder
 divNumb:
 	#LOAD WORDS
 	lw		$t0, ($a0)			#Load word of address $a0 into $t0
@@ -216,8 +248,11 @@ divNumb:
 	li		$t2, 0				#Running quotient
 	
 	#CHECK IF DIVISION BY 0
-	bnez 		$t1, loopDiv 			#Jump if not 0
-	j		divisionByZero			#Jump to divisionByZero procedure in main
+	beqz 		$t1, divisionByZero 		#Jump if 0
+	
+	#CHECK IF DIVISION BY NEGATIVE
+	bltz   		$t0, divisionByNeg 		#Jump if negative
+	bltz   		$t1, divisionByNeg 		#Jump if negative
 
 	#CHECK IF DIVIDEND IS GREATER THAN DIVISOR
 	loopDiv:
@@ -250,7 +285,13 @@ divNumb:
 		sub	$t0, $t0, $t3 			#Set dividend = dividend - temp divisor
 		j	loopDiv
 		
-#Displays result of operation
+
+
+#Procedure: DisplayNumb
+#Displays a message to the user followed by a numerical value
+#Input: $a0 points to a word address in .data memory, where the input value is stored
+#Input: $a1 points to a word address in .data memory, where the input value is stored
+#Input: $a2 points to the text string that will get displayed to the user
 displayNumb:
 	#LOAD WORDS
 	lw		$t0, ($a0)			#Load input1 value into #t0
