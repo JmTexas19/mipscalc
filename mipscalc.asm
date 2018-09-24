@@ -95,6 +95,11 @@ main:
 	
 	jal		displayNumb			#Jump and link to displayNumb
 	
+	#PRINT NEWLINE
+	li		$v0, 11				#Load print character syscall
+	addi		$a0, $0, 0xA			#Load ascii character for newline into $a0
+	syscall	
+	
 	#LOOP
 	j		main
 	
