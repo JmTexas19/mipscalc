@@ -8,13 +8,15 @@
 	input2:			.word 0
 	result:			.word 0
 	operator:		.word 0
+	remainder:		.word 0
 	
 	#Strings
 	inputString1:		.asciiz "Enter first value:\n"
 	inputString2:		.asciiz "Enter second value:\n"
 	inputOperatorStr:	.asciiz "Enter operator:\n"
 	invalidOperatorStr:	.asciiz	"Invalid operator entered, please try again...\n"
-	divisionByZero:		.asciiz "Can't divide by 0, please try again...\n"
+	divisionByZeroStr:		.asciiz "Can't divide by 0, please try again...\n"
+	remainderString:	.asciiz "Remainder: "
 .text
 #MAIN
 main:
@@ -76,10 +78,10 @@ main:
 	
 	#Jump and link to divNumb
 	divNumbJump:
-	la		$a1, input1			#Load address of input1 into $a0
-	la		$a2, input2			#Load address of input2 into $a1
-	la		$a3, result			#Load address of result into $a2
-	la		$a0, divisionByZero		#Load address of divisionByZero
+	la		$a0, input1			#Load address of input1 into $a0
+	la		$a1, input2			#Load address of input2 into $a1
+	la		$a2, result			#Load address of result into $a2
+	la		$a3, remainder 			#Load address of result into $a3
 	jal		divNumb				#Jump and link to divNumb
 	j 		continue			#Jump to continue program
 	
@@ -92,9 +94,22 @@ main:
 	la		$a2, operator			#Load address of operator into $a2
 	la		$a3, result			#Load address of result into $a3
 
-	
 	jal		displayNumb			#Jump and link to displayNumb
 	
+	#DISPLAY REMAINDER IF NECESSARY
+	lw		$t0, operator			#Load operator value into $t0
+	bne   		$t0, 47, skipRemainder		#Branch if division operator was used
+	
+	#PRINT REMAINDER
+	la		$a0, remainderString		#Load value of remainder into $a0
+	li		$v0, 4				#Load print character syscall
+	syscall		
+	
+	lw		$a0, remainder			#Load value of remainder into $a0
+	li		$v0, 1				#Load print character syscall
+	syscall						#Execute
+	
+	skipRemainder:
 	#PRINT NEWLINE
 	li		$v0, 11				#Load print character syscall
 	addi		$a0, $0, 0xA			#Load ascii character for newline into $a0
@@ -102,6 +117,13 @@ main:
 	
 	#LOOP
 	j		main
+	
+	#DIVISION BY ZERO
+	divisionByZero:
+	li		$v0, 4				#Load print string syscall
+	la		$a0, divisionByZeroStr		#Load in divisionByZero string
+	syscall						#Execute
+	j		main				#Loop Program
 	
 #Prints inputString1 and reads input from user
 getInput:
@@ -177,26 +199,24 @@ multNumb:
 #Divides 2 inputs
 divNumb:
 	#LOAD WORDS
-	lw		$t0, ($a1)			#Load word of address $a0 into $t0
-	lw		$t1, ($a2)			#Load word of address $a1 into $t1
+	lw		$t0, ($a0)			#Load word of address $a0 into $t0
+	lw		$t1, ($a1)			#Load word of address $a1 into $t1
 	li		$t2, 0				#Running quotient
 	
 	#CHECK IF DIVISION BY 0
 	bnez 		$t1, loopDiv 			#Jump if not 0
-	
-	#ELSE PRINT DIVISIONBYZERO STRING AND LOOP
-	li		$v0, 4				#Load print string syscall
-	syscall						#Execute
-	j		main				#Loop Program
+	j		divisionByZero			#Jump to divisionByZero procedure in main
 
 	#CHECK IF DIVIDEND IS GREATER THAN DIVISOR
 	loopDiv:
 		bgt     $t0, $t1, beginDivision		#Branch if dividend is greater than divisor
 		bne  	$t0, $t1, Finish		#Branch if dividend is equal to divisor
+		sub	$t0, $t0, $t1			#Subtract Dividend and Divisor = 0
 		addi	$t2, $t2, 1			#Add 1 due to dividend and divisors being equal
 		
-	Finish:
-		sw	$t2, ($a3)			#Store result into label
+	Finish:			
+		sw	$t0, ($a3)			#Store remainder into label	
+		sw	$t2, ($a2)			#Store result into label
 		jr	$ra				#Return to main
 
 	#SHIFT UNTIL DIVISOR IS BIGGER THAN DIVIDEND
@@ -278,7 +298,6 @@ displayNumb:
 	syscall	
 	
 	jr		$ra				#Return to main
-	
 	
 	
 	
