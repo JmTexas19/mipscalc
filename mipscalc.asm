@@ -47,7 +47,7 @@ main:
 	beq		$v1, 47, divNumbJump		#Branch if $v1 is a '/' operator
 
 	#INVALID OPERATOR 
-	li		$v0, 4				#Load exit syscall
+	li		$v0, 4				#Load print string syscall
 	la		$a0, invalidOperatorStr		#Load address for invalid operator string
 	syscall						#Execute
 	j		main				#Loop to start of program
@@ -122,7 +122,7 @@ main:
 	sw		$0, input2			#Clear input2
 	sw		$0, result			#Clear result
 	sw		$0, operator			#Clear operator
-	sw		$0, remainder		#Clear remainder
+	sw		$0, remainder			#Clear remainder
 	
 	#LOOP
 	j		main				#Loop to beginning of program
@@ -196,17 +196,17 @@ multNumb:
 	
 	#CHECK BIT
 	loopMult:
-		andi	$t2, $t1, 1		#Check if bit is set; #t2 bit_check
-		beqz	$t2, clearBitMult	#Branch if bit is set
-		addu	$t3, $t3, $t0		#Add dec2 to result if bit is clear; #t3 result
+		andi	$t2, $t1, 1			#Check if bit is set; #t2 bit_check
+		beqz	$t2, clearBitMult		#Branch if bit is set
+		addu	$t3, $t3, $t0			#Add dec2 to result if bit is clear; #t3 result
 
 	#MULTIPLY AND SHIFT
 	clearBitMult:
-		sll	$t0, $t0, 1		#Shift dec1 left one bit to multiply by power of 2
-		srl	$t1, $t1, 1		#Shift dec2 right one bit to check next bit
-		bnez	$t1, loopMult		#If dec2 is not equal to zero, loop again, otherwise done
-		sw 	$t3, ($a2)		#Store result into label
-		jr	$ra			#Return to main
+		sll	$t0, $t0, 1			#Shift dec1 left one bit to multiply by power of 2
+		srl	$t1, $t1, 1			#Shift dec2 right one bit to check next bit
+		bnez	$t1, loopMult			#If dec2 is not equal to zero, loop again, otherwise done
+		sw 	$t3, ($a2)			#Store result into label
+		jr	$ra				#Return to main
 	
 #Divides 2 inputs
 divNumb:
@@ -307,7 +307,7 @@ displayNumb:
 	#PRINT NEWLINE
 	li		$v0, 11				#Load print character syscall
 	addi		$a0, $0, 0xA			#Load ascii character for newline into $a0
-	syscall	
+	syscall						#Execute
 	
 	jr		$ra				#Return to main
 	
