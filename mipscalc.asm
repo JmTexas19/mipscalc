@@ -14,6 +14,7 @@
 	inputString2:		.asciiz "Enter second value:\n"
 	inputOperatorStr:	.asciiz "Enter operator:\n"
 	invalidOperatorStr:	.asciiz	"Invalid operator entered, please try again...\n"
+	divisionByZero:		.asciiz "Can't divide by 0, please try again...\n"
 .text
 #MAIN
 main:
@@ -75,9 +76,10 @@ main:
 	
 	#Jump and link to divNumb
 	divNumbJump:
-	la		$a0, input1			#Load address of input1 into $a0
-	la		$a1, input2			#Load address of input2 into $a1
-	la		$a2, result			#Load address of result into $a2
+	la		$a1, input1			#Load address of input1 into $a0
+	la		$a2, input2			#Load address of input2 into $a1
+	la		$a3, result			#Load address of result into $a2
+	la		$a0, divisionByZero		#Load address of divisionByZero
 	jal		divNumb				#Jump and link to divNumb
 	j 		continue			#Jump to continue program
 	
@@ -93,9 +95,8 @@ main:
 	
 	jal		displayNumb			#Jump and link to displayNumb
 	
-	#EXIT
-	li		$v0, 17
-	syscall
+	#LOOP
+	j		main
 	
 #Prints inputString1 and reads input from user
 getInput:
@@ -171,14 +172,18 @@ multNumb:
 #Divides 2 inputs
 divNumb:
 	#LOAD WORDS
-	lw		$t0, ($a0)			#Load word of address $a0 into $t0
-	lw		$t1, ($a1)			#Load word of address $a1 into $t1
+	lw		$t0, ($a1)			#Load word of address $a0 into $t0
+	lw		$t1, ($a2)			#Load word of address $a1 into $t1
 	li		$t2, 0				#Running quotient
 	
 	#CHECK IF DIVISION BY 0
-	bnez 		$t1, loopDiv 
+	bnez 		$t1, loopDiv 			#Jump if not 0
 	
-	
+	#ELSE PRINT DIVISIONBYZERO STRING AND LOOP
+	li		$v0, 4				#Load print string syscall
+	syscall						#Execute
+	j		main				#Loop Program
+
 	#CHECK IF DIVIDEND IS GREATER THAN DIVISOR
 	loopDiv:
 		bgt     $t0, $t1, beginDivision		#Branch if dividend is greater than divisor
@@ -186,7 +191,7 @@ divNumb:
 		addi	$t2, $t2, 1			#Add 1 due to dividend and divisors being equal
 		
 	Finish:
-		sw	$t2, ($a2)			#Store result into label
+		sw	$t2, ($a3)			#Store result into label
 		jr	$ra				#Return to main
 
 	#SHIFT UNTIL DIVISOR IS BIGGER THAN DIVIDEND
