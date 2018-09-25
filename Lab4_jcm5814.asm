@@ -27,7 +27,7 @@ main:
 	jal 		getInput			#Jump to procedure printInputStr1
 	
 	#GET OPERATOR
-	la		$a0, inputOperatorStr		#Load pointer inputOperatorStr into $a0
+	la		$a0, inputOperatorStr		#Load pointer inputOperatorStr into $a
 	la		$a1, operator			#Load pointer operator into $a1
 	jal		getOperator
 	
