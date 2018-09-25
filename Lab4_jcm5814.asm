@@ -11,7 +11,7 @@
 	remainder:		.word 0
 	
 	#Strings
-	inputString1:		.asciiz "Enter first value:\n"
+	inputString1:		.asciiz "omae wa mou shinderu:\n"
 	inputString2:		.asciiz "Enter second value:\n"
 	inputOperatorStr:	.asciiz "Enter operator:\n"
 	invalidOperatorStr:	.asciiz	"Invalid operator entered, please try again...\n"
@@ -27,7 +27,7 @@ main:
 	jal 		getInput			#Jump to procedure printInputStr1
 	
 	#GET OPERATOR
-	la		$a0, inputOperatorStr		#Load pointer inputOperatorStr into $a0
+	la		$a0, inputOperatorStr		#Load pointer inputOperatorStr into $a
 	la		$a1, operator			#Load pointer operator into $a1
 	jal		getOperator
 	
@@ -243,8 +243,8 @@ multNumb:
 #Input: $a3 points to a word address in .data memory, where to store the remainder
 divNumb:
 	#LOAD WORDS
-	lw		$t0, ($a0)			#Load word of address $a0 into $t0
-	lw		$t1, ($a1)			#Load word of address $a1 into $t1
+	lw		$t1, ($a0)			#Load word of address $a0 into $t0
+	lw		$t0, ($a1)			#Load word of address $a1 into $t1
 	li		$t2, 0				#Running quotient
 	
 	#CHECK IF DIVISION BY 0
@@ -258,7 +258,7 @@ divNumb:
 	loopDiv:
 		bgt     $t0, $t1, beginDivision		#Branch if dividend is greater than divisor
 		bne  	$t0, $t1, Finish		#Branch if dividend is equal to divisor
-		sub	$t0, $t0, $t1			#Subtract Dividend and Divisor = 0
+		sub	$t0, $t1, $t0			#Subtract Dividend and Divisor = 0
 		addi	$t2, $t2, 1			#Add 1 due to dividend and divisors being equal
 		
 	Finish:			
