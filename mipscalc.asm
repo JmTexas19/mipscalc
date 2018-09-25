@@ -144,7 +144,7 @@ main:
 	
 #Procedure:  GetInput
 #Displays a prompt to the user and then wait for a numerical input
-#The userÅfs input will get stored to the (word) address pointed by $a1
+#The user?fs input will get stored to the (word) address pointed by $a1
 #Input: $a0 points to the text string that will get displayed to the user
 #Input: $a1 points to a word address in .data memory, where to store the input number
 getInput:
@@ -296,9 +296,19 @@ displayNumb:
 	#LOAD WORDS
 	lw		$t0, ($a0)			#Load input1 value into #t0
 	lw		$t1, ($a1)			#Load input2 value into #t1
+
+#Procedure: displayEquation
+#Displays the equation of the user inputted values. ([input1] [operator] [input2] = [result]
+#Input: $a0 points to a word address in .data memory, where the input1 value is store
+#Input: $a1 points to a word address in .data memory, where the input2 value is store
+#Input: $a2 points to a word address in .data memory, where the operator value is store
+#Input: $a3 points to a word address in .data memory, where the result value is store
+displayEquation:
+	#LOAD WORDS
+	lw		$t0, ($a0)			#Load input1 value into #t0
+	lw		$t1, ($a1)			#Load input2 value into #t1
 	lw		$t2, ($a2)			#Load operator asciiz value into #t2
 	lw		$t3, ($a3)			#Load result value into #t3
-
 	
 	#PRINT INPUT1
 	li		$v0, 1				#Load syscall for print integer
