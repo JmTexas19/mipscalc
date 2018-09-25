@@ -41,44 +41,24 @@ main:
 	la		$a1, input2			#Load pointer input2 into $a1
 	jal 		getInput			#Jump to procedure printInputStr1
 	
-	#LOAD ARGUMENTS
+	#LOAD ARGUMENTS AND RETURN REGISTER
 	la		$a0, input1			#Load address of input1 into $a0
 	la		$a1, input2			#Load address of input2 into $a1
 	la		$a2, result			#Load address of result into $a2
 	la		$a3, remainder 			#Load address of result into $a3
+	la		$ra, continue			#Make return register return to continue label
 
 	#OPERATOR BRANCH
-	beq		$v1, 43, addNumbJump		#Branch if $v1 is a '+' operator
-	beq		$v1, 45, subNumbJump		#Branch if $v1 is a '-' operator
-	beq		$v1, 42, multNumbJump		#Branch if $v1 is a '*' operator
-	beq		$v1, 47, divNumbJump		#Branch if $v1 is a '/' operator
+	beq		$v1, 43, addNumb		#Branch if $v1 is a '+' operator
+	beq		$v1, 45, subNumb		#Branch if $v1 is a '-' operator
+	beq		$v1, 42, multNumb		#Branch if $v1 is a '*' operator
+	beq		$v1, 47, divNumb		#Branch if $v1 is a '/' operator
 
 	#INVALID OPERATOR 
 	li		$v0, 4				#Load print string syscall
 	la		$a0, invalidOperatorStr		#Load address for invalid operator string
 	syscall						#Execute
 	j		main				#Loop to start of program
-	
-	#Jump and link to addNumb (This is done so that we can return and continue from the procedures since branch doesn't link.)
-	addNumbJump:
-	jal		addNumb				#Jump and link to addNumb
-	j 		continue			#Jump to continue program
-	
-	#Jump and link to subNumb
-	subNumbJump:
-	jal		subNumb				#Jump and link to subNumb
-	j 		continue			#Jump to continue program
-	
-	#Jump and link to multNumb
-	multNumbJump:
-	jal		multNumb			#Jump and link to multNumb
-	j 		continue			#Jump to continue program
-	
-	#Jump and link to divNumb
-	divNumbJump:
-
-	jal		divNumb				#Jump and link to divNumb
-	j 		continue			#Jump to continue program
 	
 	#Continue after operation is done
 	continue:
@@ -279,8 +259,6 @@ divNumb:
 		sub	$t0, $t0, $t3 			#Set dividend = dividend - temp divisor
 		j	loopDiv
 		
-
-
 #Procedure: DisplayNumb
 #Displays a message to the user followed by a numerical value
 #Input: $a0 points to a word address in .data memory, where the input value is stored
