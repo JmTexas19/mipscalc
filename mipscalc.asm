@@ -40,6 +40,12 @@ main:
 	la		$a0, inputString2		#Load pointer inputString2 into $a0
 	la		$a1, input2			#Load pointer input2 into $a1
 	jal 		getInput			#Jump to procedure printInputStr1
+	
+	#LOAD ARGUMENTS
+	la		$a0, input1			#Load address of input1 into $a0
+	la		$a1, input2			#Load address of input2 into $a1
+	la		$a2, result			#Load address of result into $a2
+	la		$a3, remainder 			#Load address of result into $a3
 
 	#OPERATOR BRANCH
 	beq		$v1, 43, addNumbJump		#Branch if $v1 is a '+' operator
@@ -55,34 +61,22 @@ main:
 	
 	#Jump and link to addNumb (This is done so that we can return and continue from the procedures since branch doesn't link.)
 	addNumbJump:
-	la		$a0, input1			#Load address of input1 into $a0
-	la		$a1, input2			#Load address of input2 into $a1
-	la		$a2, result			#Load address of result into $a2
 	jal		addNumb				#Jump and link to addNumb
 	j 		continue			#Jump to continue program
 	
 	#Jump and link to subNumb
 	subNumbJump:
-	la		$a0, input1			#Load address of input1 into $a0
-	la		$a1, input2			#Load address of input2 into $a1
-	la		$a2, result			#Load address of result into $a2
 	jal		subNumb				#Jump and link to subNumb
 	j 		continue			#Jump to continue program
 	
 	#Jump and link to multNumb
 	multNumbJump:
-	la		$a0, input1			#Load address of input1 into $a0
-	la		$a1, input2			#Load address of input2 into $a1
-	la		$a2, result			#Load address of result into $a2
 	jal		multNumb			#Jump and link to multNumb
 	j 		continue			#Jump to continue program
 	
 	#Jump and link to divNumb
 	divNumbJump:
-	la		$a0, input1			#Load address of input1 into $a0
-	la		$a1, input2			#Load address of input2 into $a1
-	la		$a2, result			#Load address of result into $a2
-	la		$a3, remainder 			#Load address of result into $a3
+
 	jal		divNumb				#Jump and link to divNumb
 	j 		continue			#Jump to continue program
 	
@@ -95,7 +89,7 @@ main:
 	la		$a2, operator			#Load address of operator into $a2
 	la		$a3, result			#Load address of result into $a3
 
-	jal		displayNumb			#Jump and link to displayNumb
+	jal		displayEquation			#Jump and link to displayNumb
 	
 	#DISPLAY REMAINDER IF NECESSARY
 	lw		$t0, operator			#Load operator value into $t0
