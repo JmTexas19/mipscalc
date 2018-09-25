@@ -18,6 +18,7 @@
 	divisionByZeroStr:	.asciiz "Can't divide by 0, please try again...\n"
 	divisionByNegStr:	.asciiz "Negaive #'s not supported, please try again...\n"
 	remainderString:	.asciiz "Remainder: "
+	resultString:		.asciiz "Result: "
 .text
 #MAIN
 main:
@@ -60,10 +61,15 @@ main:
 	syscall						#Execute
 	j		main				#Loop to start of program
 	
-	#Continue after operation is done
+	#CONTINUE
 	continue:
 	
 	#DISPLAY RESULT
+	la		$a0, resultString		#Load address of resultString into $a0
+	la		$a1, result			#Load address of result into $a1
+	jal		displayNumb			#Jump and link to displayNumb
+	
+	#DISPLAY EQUATION
 	la		$a0, input1			#Load address of input1 into $a0
 	la		$a1, input2			#Load address of input2 into $a1
 	la		$a2, operator			#Load address of operator into $a2
@@ -261,13 +267,27 @@ divNumb:
 		
 #Procedure: DisplayNumb
 #Displays a message to the user followed by a numerical value
-#Input: $a0 points to a word address in .data memory, where the input value is stored
+#Input: $a0 points to the text string that will get displayed to the user
 #Input: $a1 points to a word address in .data memory, where the input value is stored
-#Input: $a2 points to the text string that will get displayed to the user
 displayNumb:
 	#LOAD WORDS
-	lw		$t0, ($a0)			#Load input1 value into #t0
-	lw		$t1, ($a1)			#Load input2 value into #t1
+	lw		$t0, ($a1)			#Load input2 value into $t0
+	
+	#PRINT STRING
+	li		$v0, 4				#Load print string syscall
+	syscall						#Execute
+	
+	#PRINT RESULT
+	li		$v0, 1				#Load print integer syscall
+	move		$a0, $t0			#Copy value of $t0 into $a0 for printing
+	syscall						#Execute
+	
+	#PRINT NEWLINE
+	li		$v0, 11				#Load print character syscall
+	addi		$a0, $0, 0xA			#Load ascii character for newline into $a0
+	syscall						#Execute
+	
+	jr		$ra				#Return to main
 
 #Procedure: displayEquation
 #Displays the equation of the user inputted values. ([input1] [operator] [input2] = [result]
