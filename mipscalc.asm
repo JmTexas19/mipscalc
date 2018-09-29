@@ -4,8 +4,10 @@
 
 .data
 	#Variables
-	input1:			.byte 0:80
-	input2:			.byte 0:80
+	buffer1:		.byte 0:80
+	buffer2:		.byte 0:80
+	input1:			.word 0
+	input2:			.word 0
 	result:			.word 0
 	remainder:		.word 0
 	
@@ -23,12 +25,12 @@
 main:
 	#GETINPUT1
 	la		$a0, inputString1		#Load pointer inputString1 into $a0
-	la		$a1, input1			#Load pointer input1 into $a1
+	la		$a1, buffer1			#Load pointer input1 into $a1
 	jal 		getInput			#Jump to procedure printInputStr1
 	
 	#PARSEINPUT1
-	la		$a0, input1			#Load pointer inputString1 into $a0
-	la		$a1, result			#Load pointer input1 into $a1
+	la		$a0, buffer1			#Load pointer inputString1 into $a0
+	la		$a1, input1			#Load pointer input1 into $a1
 	jal 		parseString			#Jump to procedure printInputStr1	
 	
 	#GET OPERATOR
@@ -43,12 +45,12 @@ main:
 	
 	#GETINPUT2
 	la		$a0, inputString2		#Load pointer inputString2 into $a0
-	la		$a1, input2			#Load pointer input2 into $a1
+	la		$a1, buffer2			#Load pointer input2 into $a1
 	jal 		getInput			#Jump to procedure printInputStr1
 	
 	#PARSEINPUT2
-	la		$a0, input2			#Load pointer inputString1 into $a0
-	la		$a1, result			#Load pointer input1 into $a1
+	la		$a0, buffer2			#Load pointer inputString1 into $a0
+	la		$a1, input2			#Load pointer input1 into $a1
 	jal 		parseString			#Jump to procedure printInputStr1
 	
 	#LOAD ARGUMENTS AND RETURN REGISTER
