@@ -133,7 +133,7 @@ getInput:
 	syscall						#Execute
 	
 	#READ INPUT
-	li		$v0, 5				#Load read integer syscall
+	li		$v0, 8				#Load read integer syscall
 	syscall						#Execute
 	sw		$v0, ($a1)			#Store value at address $a1 into label
 	
