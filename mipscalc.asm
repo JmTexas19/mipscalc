@@ -389,7 +389,6 @@ parseString:
 	#INCREMENT
 	lb		$t1, 0($a0)			#Load byte of input
 	addiu		$a0, $a0, 1			#Next byte
-	addi		$t0, $t0, 1			#Increment count
 	j		parseLoop			#Loop
 	
 	#DOLLARS HAVE BEEN PARSED
@@ -398,10 +397,16 @@ parseString:
 	
 	#PARSE DECIMAL
 	bne 		$t1, 0x2E, parseDone		#If last char not decimal... Done
-	lb		$t1, 0($a0)			#Load byte of input
 	addiu		$a0, $a0, 1			#Next byte
+	lb		$t1, 0($a0)			#Load byte of input
 	sub		$t3, $t1, 48			#Convert to binary 0-9
-	mul		$t0, $t0, 10			#Multiply $t0 by 10
+	mul		$t3, $t3, 10			#Multiply $t0 by 10
+	add		$t0, $t0, $t3			#Add to dollars amount
+	
+	#PENNIES
+	addiu		$a0, $a0, 1			#Next byte
+	lb		$t1, 0($a0)			#Load byte of input
+	sub		$t3, $t1, 48			#Convert to binary 0-9
 	add		$t0, $t0, $t3			#Add to dollars amount
 
 	parseDone:
