@@ -101,7 +101,7 @@ main:
 	sw		$0, input1			#Clear input1
 	sw		$0, input2			#Clear input2
 	sw		$0, result			#Clear result
-	move		$0, $s0			#Clear operator
+	move		$0, $s0				#Clear operator
 	sw		$0, remainder			#Clear remainder
 	
 	#LOOP
@@ -352,6 +352,26 @@ displayEquation:
 	syscall						#Execute
 	
 	jr		$ra				#Return to main
+	
+#Procedure: parseString
+#Parses the string passed in and converts/returns an integer.
+#Input: $a0 points to a word address in .data memory, where the input1 value is stored
+parseString:
+	addi		$t0, $0, 0			#Reset register
+	
+	#Parse each byte in the input
+	parseLoop:
+	lw		$t1, 0($a0)			#Load byte into $t1
+	beqz		$t1, parseLoopBreak		#If byte is null, break
+	beq		$t1, 0xA parseLoopBreak		#If byte is equalt to cr, break
+	beq		$t1, 0x2E parseLoopBreak	#If byte is decimal break
+	lb		$t1, 0($a0)			#Load byte of input
+	addiu		$a0, $a0, 1			#Next byte
+	addi		$t0, $t0, 1			#Increment count
+	j		parseLoop			#Loop
+	
+	parseLoopBreak:
+	
 	
 	
 	
