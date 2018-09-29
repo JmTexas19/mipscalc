@@ -7,7 +7,6 @@
 	input1:			.byte 0:80
 	input2:			.byte 0:80
 	result:			.word 0
-	operator:		.word 0
 	remainder:		.word 0
 	
 	#Strings
@@ -29,7 +28,7 @@ main:
 	
 	#GET OPERATOR
 	la		$a0, inputOperatorStr		#Load pointer inputOperatorStr into $a0
-	la		$a1, operator			#Load pointer operator into $a1
+	move		$a1, $s0			#Load pointer operator into $a1
 	jal		getOperator
 	
 	#PRINT NEWLINE
@@ -72,13 +71,13 @@ main:
 	#DISPLAY EQUATION
 	la		$a0, input1			#Load address of input1 into $a0
 	la		$a1, input2			#Load address of input2 into $a1
-	la		$a2, operator			#Load address of operator into $a2
+	move		$a2, $s0			#Load address of operator into $a2
 	la		$a3, result			#Load address of result into $a3
 
 	jal		displayEquation			#Jump and link to displayNumb
 	
 	#DISPLAY REMAINDER IF NECESSARY
-	lw		$t0, operator			#Load operator value into $t0
+	move		$t0, $s0			#Load operator value into $t0
 	bne   		$t0, 47, skipRemainder		#Branch if division operator was used
 	
 	#PRINT REMAINDER
@@ -102,7 +101,7 @@ main:
 	sw		$0, input1			#Clear input1
 	sw		$0, input2			#Clear input2
 	sw		$0, result			#Clear result
-	sw		$0, operator			#Clear operator
+	move		$0, $s0			#Clear operator
 	sw		$0, remainder			#Clear remainder
 	
 	#LOOP
@@ -152,7 +151,7 @@ getOperator:
 	li		$v0, 12				#Load read character syscall
 	syscall						#Execute
 	move		$v1, $v0			#Return operator character in $v1
-	sw		$v1, ($a1)			#Store asciiz number into label
+	move		$s0, $v1			#Store asciiz number into label
 	
 	jr		$ra				#Return to main
 	
