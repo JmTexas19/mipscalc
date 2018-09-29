@@ -362,14 +362,25 @@ parseString:
 	#Parse each byte in the input
 	parseLoop:
 	lw		$t1, 0($a0)			#Load byte into $t1
+	#CHECKS
 	beqz		$t1, parseLoopBreak		#If byte is null, break
 	beq		$t1, 0xA parseLoopBreak		#If byte is equalt to cr, break
 	beq		$t1, 0x2E parseLoopBreak	#If byte is decimal break
+	
+	#[GOING TO NEED TO CHECK FOR ERROR HERE] TODO
+	
+	#CONVERT
+	add		$t3, $t1, 48			#Add 48 decimal to byte
+	mul		$t0, $t1, 10			#Multiply $t0 by 10
+	add		$t3, $t0, $t3			#Add digit int
+	
+	#INCREMENT
 	lb		$t1, 0($a0)			#Load byte of input
 	addiu		$a0, $a0, 1			#Next byte
 	addi		$t0, $t0, 1			#Increment count
 	j		parseLoop			#Loop
 	
+	#DOLLARS HAVE BEEN PARSED
 	parseLoopBreak:
 	
 	
