@@ -4,8 +4,8 @@
 
 .data
 	#Variables
-	input1:			.word 0
-	input2:			.word 0
+	input1:			.byte 0:80
+	input2:			.byte 0:80
 	result:			.word 0
 	operator:		.word 0
 	remainder:		.word 0
