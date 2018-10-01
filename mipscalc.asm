@@ -92,15 +92,6 @@ main:
 	move		$t0, $s0			#Load operator value into $t0
 	bne   		$t0, 47, skipRemainder		#Branch if division operator was used
 	
-	#PRINT REMAINDER
-	la		$a0, remainderString		#Load value of remainder into $a0
-	li		$v0, 4				#Load print character syscall
-	syscall		
-	
-	lw		$a0, remainder			#Load value of remainder into $a0
-	li		$v0, 1				#Load print character syscall
-	syscall						#Execute
-	
 	#If not division, remainder is skipped
 	skipRemainder:
 	
@@ -289,19 +280,20 @@ displayNumb:
 	syscall						#Execute
 	
 	#FIX DECIMAL FOR MULTIPLICATION
-	bne		$s0, 42, skipFixDecimal		#Branch if $v1 is a '*' operator
+	bne		$s0, 42, skipToDiv		#Branch if $v1 is a '*' operator
 	div		$t1, $t0, 10000			#Divide result by 100 to get dollars
 	rem		$t2, $t0, 10000			#Modulo to get cents
 	j		printNumb			#Jump to printing
 	
 	#OR DIVISION
-	bne		$s0, 47, skipFixDecimal		#Branch if $v1 is a '/' operator
-	#mult		$t1, $t0, 100			#Divide result by 100 to get dollars
-	#rem		$t2, $t0, 100			#Modulo to get cents
+	skipToDiv:
+	bne		$s0, 47, printNumb		#Branch if $v1 is a '/' operator
+	mul		$t1, $t0, 1			#Divide result by 100 to get dollars
+	rem		$t2, $t0, 1			#Modulo to get cents
 	j		printNumb			#Jump to printing
 	
 	#GET DOLLARS AND CENTS
-	skipFixDecimal:
+	skipToAddSub:					#Skip if not division
 	div		$t1, $t0, 100			#Divide result by 100 to get dollars
 	rem		$t2, $t0, 100			#Modulo to get cents
 	
@@ -334,6 +326,17 @@ displayNumb:
 	
 	jr		$ra				#Return to main
 	
+	#PRINT REMAINDER
+	bne 		$s0, 47, skipRemainder		#If not division skip remainder
+	la		$a0, remainderString		#Load value of remainder into $a0
+	li		$v0, 4				#Load print character syscall
+	syscall						#Execute
+	lw		$a0, remainder			#Load value of remainder into $a0
+	li		$v0, 1				#Load print character syscall
+	syscall						#Execute
+	j		printNumb			#Jump to printing
+	
+	skipPrintRemainder:
 	#PRINT NEWLINE
 	li		$v0, 11				#Load print character syscall
 	addi		$a0, $0, 0xA			#Load ascii character for newline into $a0
