@@ -282,21 +282,37 @@ divNumb:
 #Input: $a0 points to the text string that will get displayed to the user
 #Input: $a1 points to a word address in .data memory, where the input value is stored
 displayNumb:
-	#LOAD WORDS
-	lw		$t0, ($a1)			#Load input2 value into $t0
-	
 	#PRINT STRING
 	li		$v0, 4				#Load print string syscall
 	syscall						#Execute
 	
-	#PRINT RESULT
+	#GET DOLLARS AND CENTS
+	lw		$t0, ($a1)			#Load result
+	div		$t1, $t0, 100			#Divide result by 100 to get dollars
+	rem		$t2, $t0, 100			#Modulo to get cents
+	
+	#PRINT DOLLARS
 	li		$v0, 1				#Load print integer syscall
-	move		$a0, $t0			#Copy value of $t0 into $a0 for printing
+	move		$a0, $t1			#Copy value of $t0 into $a0 for printing
+	syscall						#Execute
+
+	#PRINT DECIMAL
+	li		$v0, 11				#Load print integer syscall
+	addi		$a0, $0, 0x2E			#Copy ascii for decimal
 	syscall						#Execute
 	
-	#PRINT NEWLINE
-	li		$v0, 11				#Load print character syscall
-	addi		$a0, $0, 0xA			#Load ascii character for newline into $a0
+	#FIX CENTS
+	div		$t3, $t2, 10			#Get dimes by dividing cents by 10
+	rem		$t4, $t2, 10			#Get pennies by dividing cents by 10
+	
+	#PRINT DIMES
+	li		$v0, 1				#Load print integer syscall
+	move		$a0, $t3			#Copy value of $t3 into $a0 for printing
+	syscall						#Execute
+	
+	#PRINT PENNIES
+	li		$v0, 1				#Load print integer syscall
+	move		$a0, $t4			#Copy value of $t4 into $a0 for printing
 	syscall						#Execute
 	
 	jr		$ra				#Return to main
