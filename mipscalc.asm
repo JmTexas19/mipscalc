@@ -296,8 +296,8 @@ displayNumb:
 	
 	#OR DIVISION
 	bne		$s0, 47, skipFixDecimal		#Branch if $v1 is a '/' operator
-	div		$t1, $t0, 1000			#Divide result by 100 to get dollars
-	rem		$t2, $t0, 1000			#Modulo to get cents
+	#mult		$t1, $t0, 100			#Divide result by 100 to get dollars
+	#rem		$t2, $t0, 100			#Modulo to get cents
 	j		printNumb			#Jump to printing
 	
 	#GET DOLLARS AND CENTS
@@ -333,6 +333,11 @@ displayNumb:
 	syscall						#Execute
 	
 	jr		$ra				#Return to main
+	
+	#PRINT NEWLINE
+	li		$v0, 11				#Load print character syscall
+	addi		$a0, $0, 0xA			#Load ascii character for newline into $a0
+	syscall						#Execute
 
 #Procedure: displayEquation
 #Displays the equation of the user inputted values. ([input1] [operator] [input2] = [result]
@@ -405,6 +410,9 @@ displayEquation:
 #Input: $a1 points to a word address in .data memory, where the input1 value is stored
 parseString:
 	addi		$t0, $0, 0			#Reset register
+	addi		$t1, $0, 0			#Reset register
+	addi		$t2, $0, 0			#Reset register
+	addi		$t3, $0, 0			#Reset register
 	
 	#Parse each byte in the input
 	parseLoop:
@@ -442,6 +450,7 @@ parseString:
 	addiu		$a0, $a0, 1			#Next byte
 	lb		$t1, 0($a0)			#Load byte of input
 	sub		$t3, $t1, 48			#Convert to binary 0-9
+	bltz		$t3, parseDone			#If $t3 is less than 0 skip add
 	add		$t0, $t0, $t3			#Add to dollars amount
 
 	parseDone:
