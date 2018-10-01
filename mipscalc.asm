@@ -229,6 +229,7 @@ divNumb:
 	#LOAD WORDS
 	lw		$t0, ($a0)			#Load word of address $a0 into $t0
 	lw		$t1, ($a1)			#Load word of address $a1 into $t1
+	mul		$t0, $t0, 100			#Multiply input1 by 100 to keep decimal
 	li		$t2, 0				#Running quotient
 	
 	#CHECK IF DIVISION BY 0
@@ -246,6 +247,7 @@ divNumb:
 		addi	$t2, $t2, 1			#Add 1 due to dividend and divisors being equal
 		
 	Finish:			
+		#ADD DECIMAL
 		sw	$t0, ($a3)			#Store remainder into label	
 		sw	$t2, ($a2)			#Store result into label
 		jr	$ra				#Return to main
@@ -293,8 +295,8 @@ displayNumb:
 	#OR DIVISION
 	skipToDiv:
 	bne		$s0, 47, printNumb		#Branch if $v1 is a '/' operator
-	mul		$t1, $t0, 1			#Divide result by 100 to get dollars
-	rem		$t2, $t0, 1			#Modulo to get cents
+	div		$t1, $t0, 100			#Divide result by 100 to get dollars
+	rem		$t2, $t0, 100			#Modulo to get cents
 	
 	#FIX REMAINDER
 	div		$t5, $t4, 100			#Fix remainder value get dollars
