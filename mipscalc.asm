@@ -78,6 +78,7 @@ main:
 	#DISPLAY RESULT
 	la		$a0, resultString		#Load address of resultString into $a0
 	la		$a1, result			#Load address of result into $a1
+	la		$a2, remainder			#Load address of remainder into $a2
 	jal		displayNumb			#Jump and link to displayNumb
 	
 	#DISPLAY EQUATION
@@ -272,8 +273,12 @@ divNumb:
 #Displays a message to the user followed by a numerical value
 #Input: $a0 points to the text string that will get displayed to the user
 #Input: $a1 points to a word address in .data memory, where the input value is stored
+#Input: $a2 points to a word address in .data memory, where the remainder value is stored
+#VALUES: $t0 = result; $t1 = result_dollars; $t2 = result_dimes; $t3 = result_pennies; 
+#VALUES: $t4 = remainder; $t5 = remainder_dollars; $t6 = remainder_dimes; $t7 = remainder_pennies
 displayNumb:
 	lw		$t0, ($a1)			#Load result
+	lw		$t4, ($a2)			#Load remainder
 	
 	#PRINT STRING
 	li		$v0, 4				#Load print string syscall
@@ -290,6 +295,10 @@ displayNumb:
 	bne		$s0, 47, printNumb		#Branch if $v1 is a '/' operator
 	mul		$t1, $t0, 1			#Divide result by 100 to get dollars
 	rem		$t2, $t0, 1			#Modulo to get cents
+	
+	#FIX REMAINDER
+	div		$t5, $t4, 100			#Fix remainder value get dollars
+	rem		$t6, $t4, 100			#Modulo to get cents
 	j		printNumb			#Jump to printing
 	
 	#GET DOLLARS AND CENTS
@@ -311,6 +320,8 @@ displayNumb:
 	#FIX CENTS
 	div		$t3, $t2, 10			#Get dimes by dividing cents by 10
 	rem		$t4, $t2, 10			#Get pennies by dividing cents by 10
+	rem		$t7, $t6, 10			#Get pennies by dividing cents by 10
+	div		$t6, $t6, 10			#Get dimes by dividing cents by 10
 	abs		$t3, $t3			#Make positive so negative sign isn't print
 	abs		$t4, $t4			#Make positive so negative sign isn't print
 	
@@ -324,23 +335,45 @@ displayNumb:
 	move		$a0, $t4			#Copy value of $t4 into $a0 for printing
 	syscall						#Execute
 	
-	jr		$ra				#Return to main
+	#PRINT NEWLINE
+	li		$v0, 11				#Load print character syscall
+	addi		$a0, $0, 0xA			#Load ascii character for newline into $a0
+	syscall						#Execute
 	
 	#PRINT REMAINDER
+	#STRING
 	bne 		$s0, 47, skipRemainder		#If not division skip remainder
 	la		$a0, remainderString		#Load value of remainder into $a0
 	li		$v0, 4				#Load print character syscall
 	syscall						#Execute
-	lw		$a0, remainder			#Load value of remainder into $a0
-	li		$v0, 1				#Load print character syscall
+	
+	#PRINT DOLLARS
+	li		$v0, 1				#Load print integer syscall
+	move		$a0, $t5			#Copy value of $t0 into $a0 for printing
 	syscall						#Execute
-	j		printNumb			#Jump to printing
+	
+	#PRINT DECIMAL
+	li		$v0, 11				#Load print integer syscall
+	addi		$a0, $0, 0x2E			#Copy ascii for decimal
+	syscall						#Execute
+	
+	#PRINT DIMES
+	li		$v0, 1				#Load print integer syscall
+	move		$a0, $t6			#Copy value of $t3 into $a0 for printing
+	syscall						#Execute
+	
+	#PRINT PENNIES
+	li		$v0, 1				#Load print integer syscall
+	move		$a0, $t7			#Copy value of $t4 into $a0 for printing
+	syscall						#Execute
 	
 	skipPrintRemainder:
 	#PRINT NEWLINE
 	li		$v0, 11				#Load print character syscall
 	addi		$a0, $0, 0xA			#Load ascii character for newline into $a0
 	syscall						#Execute
+	
+	jr		$ra				#Return to main
 
 #Procedure: displayEquation
 #Displays the equation of the user inputted values. ([input1] [operator] [input2] = [result]
