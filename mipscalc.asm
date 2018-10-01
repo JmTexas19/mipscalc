@@ -304,6 +304,8 @@ displayNumb:
 	#FIX CENTS
 	div		$t3, $t2, 10			#Get dimes by dividing cents by 10
 	rem		$t4, $t2, 10			#Get pennies by dividing cents by 10
+	abs		$t3, $t3			#Make positive so negative sign isn't print
+	abs		$t4, $t4			#Make positive so negative sign isn't print
 	
 	#PRINT DIMES
 	li		$v0, 1				#Load print integer syscall
