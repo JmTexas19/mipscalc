@@ -282,15 +282,30 @@ divNumb:
 #Input: $a0 points to the text string that will get displayed to the user
 #Input: $a1 points to a word address in .data memory, where the input value is stored
 displayNumb:
+	lw		$t0, ($a1)			#Load result
+	
 	#PRINT STRING
 	li		$v0, 4				#Load print string syscall
 	syscall						#Execute
 	
+	#FIX DECIMAL FOR MULTIPLICATION
+	bne		$s0, 42, skipFixDecimal		#Branch if $v1 is a '*' operator
+	div		$t1, $t0, 10000			#Divide result by 100 to get dollars
+	rem		$t2, $t0, 10000			#Modulo to get cents
+	j		printNumb			#Jump to printing
+	
+	#OR DIVISION
+	bne		$s0, 47, skipFixDecimal		#Branch if $v1 is a '/' operator
+	div		$t1, $t0, 1000			#Divide result by 100 to get dollars
+	rem		$t2, $t0, 1000			#Modulo to get cents
+	j		printNumb			#Jump to printing
+	
 	#GET DOLLARS AND CENTS
-	lw		$t0, ($a1)			#Load result
+	skipFixDecimal:
 	div		$t1, $t0, 100			#Divide result by 100 to get dollars
 	rem		$t2, $t0, 100			#Modulo to get cents
 	
+	printNumb:
 	#PRINT DOLLARS
 	li		$v0, 1				#Load print integer syscall
 	move		$a0, $t1			#Copy value of $t0 into $a0 for printing
