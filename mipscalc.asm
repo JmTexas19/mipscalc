@@ -229,6 +229,7 @@ divNumb:
 	#LOAD WORDS
 	lw		$t0, ($a0)			#Load word of address $a0 into $t0
 	lw		$t1, ($a1)			#Load word of address $a1 into $t1
+	move		$t5, $0				#Remainder boolean
 	mul		$t0, $t0, 100			#Multiply input1 by 100 to keep decimal
 	li		$t2, 0				#Running quotient
 	
@@ -242,14 +243,22 @@ divNumb:
 	#CHECK IF DIVIDEND IS GREATER THAN DIVISOR
 	loopDiv:
 		bgt     $t0, $t1, beginDivision		#Branch if dividend is greater than divisor
-		bne  	$t0, $t1, Finish		#Branch if dividend is equal to divisor
+		bne  	$t0, $t1, finish		#Branch if dividend is equal to divisor
 		sub	$t0, $t0, $t1			#Subtract Dividend and Divisor = 0
 		addi	$t2, $t2, 1			#Add 1 due to dividend and divisors being equal
 		
-	Finish:			
-		#ADD DECIMAL
-		sw	$t0, ($a3)			#Store remainder into label	
+	finish:			
+		#STORE RESULT
+		beq	$t5, 1, skipStore		#If result is already stored, skip
 		sw	$t2, ($a2)			#Store result into label
+		lw	$t0, ($a0)			#Reset input 1
+		lw	$t1, ($a1)			#Reset input 2
+		addi	$t5, $t5, 1			#Set boolean
+		j	beginDivision			#Loop again to get correct remainder
+		
+		#TRUE FINISH
+		skipStore:
+		sw	$t0, ($a3)			#Store remainder into label	
 		jr	$ra				#Return to main
 
 	#SHIFT UNTIL DIVISOR IS BIGGER THAN DIVIDEND
