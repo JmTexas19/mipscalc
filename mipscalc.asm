@@ -297,13 +297,13 @@ displayNumb:
 	
 	#FIX DECIMAL FOR MULTIPLICATION
 	bne		$s0, 42, skipToDiv		#Branch if $v1 is a '*' operator
-	div		$t0, $t0, 100			#Adjust result for correct multiplication
-	div		$t1, $t0, 100			#Divide result by 100 to get dollars
-	rem		$t2, $t0, 100			#Modulo to get cents
+	div		$t1, $t0, 10000			#Divide result by 100 to get dollars
+	rem		$t2, $t0, 10000			#Modulo to get cents
 	
 	#FIX CENTS
+	div		$t2, $t2, 100			#Decimal Correction
 	div		$t3, $t2, 10			#Get dimes by dividing cents by 10
-	rem		$t4, $t2, 10			#Get pennies by dividing cents by 10
+	rem		$t4, $t2, 10			#Get pennies by dividing cents by 10S
 	j		printNumb			#Jump to printing
 	
 	#OR DIVISION
