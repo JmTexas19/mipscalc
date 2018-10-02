@@ -83,14 +83,6 @@ main:
 	la		$a2, remainder			#Load address of remainder into $a2
 	jal		displayNumb			#Jump and link to displayNumb
 	
-	#DISPLAY EQUATION
-#	la		$a0, input1			#Load address of input1 into $a0
-#	la		$a1, input2			#Load address of input2 into $a1
-#	move		$a2, $s0			#Load address of operator into $a2
-#	la		$a3, result			#Load address of result into $a3
-#
-#	jal		displayEquation			#Jump and link to displayNumb
-	
 	#DISPLAY REMAINDER IF NECESSARY
 	move		$t0, $s0			#Load operator value into $t0
 	bne   		$t0, 47, skipRemainder		#Branch if division operator was used
@@ -397,71 +389,6 @@ displayNumb:
 	
 	jr		$ra				#Return to main
 
-#Procedure: displayEquation
-#Displays the equation of the user inputted values. ([input1] [operator] [input2] = [result]
-#Input: $a0 points to a word address in .data memory, where the input1 value is store
-#Input: $a1 points to a word address in .data memory, where the input2 value is store
-#Input: $a2 points to a word address in .data memory, where the operator value is store
-#Input: $a3 points to a word address in .data memory, where the result value is store
-displayEquation:
-	#LOAD WORDS
-	lw		$t0, ($a0)			#Load input1 value into #t0
-	lw		$t1, ($a1)			#Load input2 value into #t1
-	lw		$t2, ($a2)			#Load operator asciiz value into #t2
-	lw		$t3, ($a3)			#Load result value into #t3
-	
-	#PRINT INPUT1
-	li		$v0, 1				#Load syscall for print integer
-	move		$a0, $t0			#Copy input1 value into $a0 for printing
-	syscall						#Print integer in $a0(input1)
-	
-	#PRINT SPACE
-	li		$v0, 11				#Load syscall for print integer
-	addi		$a0, $0, 0x20			#Load ascii for space into $a0
-	syscall						#Execute
-	
-	#PRINT OPERATOR
-	li		$v0, 11				#Load syscall for print integer
-	add 		$a0, $0, $t2			#Load ascii for operator into $a0
-	syscall						#Execute
-	
-	#PRINT SPACE
-	li		$v0, 11				#Load syscall for print integer
-	addi		$a0, $0, 0x20			#Load ascii for space into $a0
-	syscall						#Execute
-	
-	#PRINT INPUT2
-	li		$v0, 1				#Load syscall for print integer
-	move		$a0, $t1			#Copy input2 value into $a0 for printing
-	syscall						#Execute
-	
-	#PRINT SPACE
-	li		$v0, 11				#Load syscall for print integer
-	addi		$a0, $0, 0x20			#Load ascii for space into $a0
-	syscall						#Execute
-	
-	#PRINT EQUAL SIGN
-	li		$v0, 11				#Load syscall for print integer
-	addi		$a0, $0, 0x3D			#Load ascii for space into $a0
-	syscall						#Execute
-	
-	#PRINT SPACE
-	li		$v0, 11				#Load syscall for print integer
-	addi		$a0, $0, 0x20			#Load ascii for space into $a0
-	syscall						#Execute
-	
-	#PRINT RESULT
-	li		$v0, 1				#Load syscall for print integer
-	move		$a0, $t3			#Copy input2 value into $a0 for printing
-	syscall						#Execute
-	
-	#PRINT NEWLINE
-	li		$v0, 11				#Load print character syscall
-	addi		$a0, $0, 0xA			#Load ascii character for newline into $a0
-	syscall						#Execute
-	
-	jr		$ra				#Return to main
-	
 #Procedure: parseString
 #Parses the string passed in and converts/returns an integer.
 #Input: $a0 points to a word address in .data memory, where the input1 value is stored
