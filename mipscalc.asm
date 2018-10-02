@@ -297,25 +297,38 @@ displayNumb:
 	
 	#FIX DECIMAL FOR MULTIPLICATION
 	bne		$s0, 42, skipToDiv		#Branch if $v1 is a '*' operator
-	div		$t1, $t0, 10000			#Divide result by 100 to get dollars
-	rem		$t2, $t0, 10000			#Modulo to get cents
+	div		$t0, $t0, 100			#Adjust result for correct multiplication
+	div		$t1, $t0, 100			#Divide result by 100 to get dollars
+	rem		$t2, $t0, 100			#Modulo to get cents
+	
+	#FIX CENTS
+	div		$t3, $t2, 10			#Get dimes by dividing cents by 10
+	rem		$t4, $t2, 10			#Get pennies by dividing cents by 10
 	j		printNumb			#Jump to printing
 	
 	#OR DIVISION
 	skipToDiv:
-	bne		$s0, 47, printNumb		#Branch if $v1 is a '/' operator
+	bne		$s0, 47, skipToAddSub		#Branch if $v1 is a '/' operator
 	div		$t1, $t0, 100			#Divide result by 100 to get dollars
 	rem		$t2, $t0, 100			#Modulo to get cents
 	
 	#FIX REMAINDER
 	div		$t5, $t4, 100			#Fix remainder value get dollars
 	rem		$t6, $t4, 100			#Modulo to get cents
+	
+	#FIX CENTS
+	div		$t3, $t2, 10			#Get dimes by dividing cents by 10
+	rem		$t4, $t2, 10			#Get pennies by dividing cents by 10
+	rem		$t7, $t6, 10			#Get pennies by dividing cents by 10 for remainder
+	div		$t6, $t6, 10			#Get dimes by dividing cents by 10 for remainder
 	j		printNumb			#Jump to printing
 	
 	#GET DOLLARS AND CENTS
 	skipToAddSub:					#Skip if not division
 	div		$t1, $t0, 100			#Divide result by 100 to get dollars
 	rem		$t2, $t0, 100			#Modulo to get cents
+	div		$t3, $t2, 10			#Get dimes by dividing cents by 10
+	rem		$t4, $t2, 10			#Get pennies by dividing cents by 10
 	
 	printNumb:
 	#PRINT DOLLARS
@@ -329,10 +342,6 @@ displayNumb:
 	syscall						#Execute
 	
 	#FIX CENTS
-	div		$t3, $t2, 10			#Get dimes by dividing cents by 10
-	rem		$t4, $t2, 10			#Get pennies by dividing cents by 10
-	rem		$t7, $t6, 10			#Get pennies by dividing cents by 10
-	div		$t6, $t6, 10			#Get dimes by dividing cents by 10
 	abs		$t3, $t3			#Make positive so negative sign isn't print
 	abs		$t4, $t4			#Make positive so negative sign isn't print
 	
