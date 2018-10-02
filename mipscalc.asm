@@ -20,7 +20,7 @@
 	divisionByNegStr:	.asciiz "Negaive #'s not supported, please try again...\n"
 	remainderString:	.asciiz "Remainder: "
 	resultString:		.asciiz "Result: "
-	invalidInputStr:		.asciiz "Invalid input, please try again...\n"
+	invalidInputStr:	.asciiz "Invalid input, please try again...\n"
 .text
 #MAIN
 main:
