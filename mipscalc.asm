@@ -20,6 +20,7 @@
 	divisionByNegStr:	.asciiz "Negaive #'s not supported, please try again...\n"
 	remainderString:	.asciiz "Remainder: "
 	resultString:		.asciiz "Result: "
+	invalidInputStr:		.asciiz "Invalid input, please try again...\n"
 .text
 #MAIN
 main:
@@ -31,6 +32,7 @@ main:
 	#PARSEINPUT1
 	la		$a0, buffer1			#Load pointer inputString1 into $a0
 	la		$a1, input1			#Load pointer input1 into $a1
+	la		$a2, invalidInputStr		#Load pointer invalidInputStr into $a2
 	jal 		parseString			#Jump to procedure printInputStr1	
 	
 	#GET OPERATOR
@@ -478,7 +480,10 @@ parseString:
 	beq		$t1, 0xA, parseLoopBreak	#If byte is equalt to cr, break
 	beq		$t1, 0x2E, parseLoopBreak	#If byte is decimal break
 	
-	#[GOING TO NEED TO CHECK FOR ERROR HERE] TODO
+	#CHECK IF ASCII 0-9
+	subi		$t4, $t1, 48			#Subtract by 48
+	bgt 		$t4, 9, reset			#If Greater than 9 not valid
+	blt 		$t4, 0, reset			#If less than 0 not valid
 	
 	#CONVERT
 	sub		$t3, $t1, 48			#Convert to binary 0-9
@@ -512,5 +517,14 @@ parseString:
 	parseDone:
 	sw		$t0, ($a1)			#Store word
 	jr		$ra				#Return
+	
+	#INVALID INPUT
+	reset:
+	#PRINT STRING
+	li		$v0, 4				#Load print string syscall
+	la		$a0, ($a2)			#Load invalidInputString
+	syscall						#Execute
+	
+	j		main				#Reset
 	
 	
