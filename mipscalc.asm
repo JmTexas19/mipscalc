@@ -8,13 +8,13 @@
 	input2:			.word 0, 0, 0, 0
 	result:			.word 0, 0, 0, 0
 	remainder:		.word 0, 0, 0, 0
-	
+	buffer:			.asciiz ""
 .data
 	#Stack
 	stack_beg:
        				.word   0 : 40
 	stack_end:
-
+	
 	#Strings
 	inputString1:		.asciiz "Enter first value:\n"
 	inputString2:		.asciiz "Enter second value:\n"
@@ -140,7 +140,7 @@ getInput:
 	#READ INPUT
 	move		$t0, $a1			#Save pointer
 	li		$v0, 8				#Load read string input
-	li		$a1, 80
+	li		$a1, 33
 	syscall						#Execute
 	move		$a1, $t0			#Reload pointer
 	
@@ -647,17 +647,26 @@ displayNumb:
 	addi $sp, $sp, -4				#Subtract 4 to stack to prevent loss of memory
    	sw $ra, 0($sp)   				#Saves #ra on stack
 	
+	#PROBLEM HERE#
+	#########################
+	# $a0 = pointer to result 
+	# $a1 = stack_beg 
+	#
+	# When using a normal string for $a1, all that prints is a square
+	# Using the stack should print the correct result, but something is overwritten and skips over PRINT RESULT
+	#########################
+	
 	#CONVERT RESULT BINARY
-	move		$a0, $a1			#Load pointer of result to be converted
-	la		$a1, stack_end 			#Load pointer of result buffer for holding string
+	move		$a0, $a1			#Load pointer of result to be converted in $a0
+	la		$a1, buffer			#Load pointer of result buffer for holding string to be printed in $a1
 	jal		BinToDecAsc			#Convert
 		
 	#LOAD RETURN FROM STACK
    	lw $ra, 0($sp)   				#Loads $ra on stack
 	addi $sp, $sp, 4				#Add 4 to stack to prevent loss of memory
 	
-	#PRINT RESULT
-	move		$a0, $a1			#Copy result into $a0
+	#PRINT RESULT	<--- THIS IS SKIPPED
+	la		$a0, buffer 			#Copy result into $a0
 	li		$v0, 4				#Load print string syscall
 	syscall						#Execute
 	
