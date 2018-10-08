@@ -82,6 +82,9 @@ main:
 	move		$t0, $s0			#Load operator value into $t0
 	bne   		$t0, 47, skipRemainder		#Branch if division operator was used
 	
+	#LOAD STACK
+	la      $sp, stack_end				#Load stack into sp register
+	
 	#DISPLAY REMAINDER
 	la		$a0, remainderString		#Load address of resultString into $a0
 	la		$a1, remainder			#Load address of result into $a1
@@ -135,8 +138,11 @@ getInput:
 	syscall						#Execute
 	
 	#READ INPUT
+	move		$t0, $a1			#Save pointer
 	li		$v0, 8				#Load read string input
+	li		$a1, 80
 	syscall						#Execute
+	move		$a1, $t0			#Reload pointer
 	
 	#SAVE RETURN TO STACK
 	addi $sp, $sp, -4				#Subtract 4 to stack to prevent loss of memory
