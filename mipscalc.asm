@@ -37,12 +37,6 @@ main:
 	la		$a1, buffer1			#Load pointer input1 into $a1
 	jal 		getInput			#Jump to procedure printInputStr1
 	
-	#PARSEINPUT1
-	la		$a0, buffer1			#Load pointer inputString1 into $a0
-	la		$a1, input1			#Load pointer input1 into $a1
-	la		$a2, invalidInputStr		#Load pointer invalidInputStr into $a2
-	jal 		parseString			#Jump to procedure printInputStr1	
-	
 	#GET OPERATOR
 	la		$a0, inputOperatorStr		#Load pointer inputOperatorStr into $a0
 	move		$a1, $s0			#Load pointer operator into $a1
@@ -142,14 +136,18 @@ getInput:
 	li		$v0, 4				#Load print string syscall
 	syscall						#Execute
 	
+	#SAVE
+	move		$t0, $a1			#Save pointer to word address
+	
 	#READ INPUT
 	li		$v0, 8				#Load read string input
-	la		$a0, ($a1)			#Load address of buffer
-	li		$a1, 32				#80 bytes of space
+	la		$a0, ($a1)			#Load word address of buffer
+	li		$a1, 80				#80 bytes of space
 	syscall						#Execute
 	
-	jr		$ra				#Return to main
-
+	move		$a1, $t0			#Put back in
+	j		DecAscToBin			#Jump to convert ascii to binary
+	
 #Procedure:  GetOperator
 #Displays a prompt to the user and then wait for a single character input
 #Input: $a0 points to the text string that will get displayed to the user
@@ -627,10 +625,8 @@ _Sqrt5:
 #Procedure: DisplayNumb
 #Displays a message to the user followed by a numerical value
 #Input: $a0 points to the text string that will get displayed to the user
-#Input: $a1 points to a word address in .data memory, where the input value is stored
+#Input: $a1 points to a word address in .data memory, where the result value is stored
 #Input: $a2 points to a word address in .data memory, where the remainder value is stored
-#VALUES: $t0 = result; $t1 = result_dollars; $t2 = result_dimes; $t3 = result_pennies; 
-#VALUES: $t4 = remainder; $t5 = remainder_dollars; $t6 = remainder_dimes; $t7 = remainder_pennies
 displayNumb:
 	lw		$t0, ($a1)			#Load result
 	lw		$t4, ($a2)			#Load remainder
@@ -738,71 +734,6 @@ displayNumb:
 	syscall						#Execute
 	
 	jr		$ra				#Return to main
-
-#Procedure: parseString
-#Parses the string passed in and converts/returns an integer.
-#Input: $a0 points to a word address in .data memory, where the input1 value is stored
-#Input: $a1 points to a word address in .data memory, where the input1 value is stored
-parseString:
-	addi		$t0, $0, 0			#Reset register
-	addi		$t1, $0, 0			#Reset register
-	addi		$t2, $0, 0			#Reset register
-	addi		$t3, $0, 0			#Reset register
-	
-	#Parse each byte in the input
-	parseLoop:
-	lb		$t1, 0($a0)			#Load byte into $t1
-	#CHECKS
-	beqz		$t1, parseLoopBreak		#If byte is null, break
-	beq		$t1, 0xA, parseLoopBreak	#If byte is equalt to cr, break
-	beq		$t1, 0x2E, parseLoopBreak	#If byte is decimal break
-	
-	#CHECK IF ASCII 0-9
-	subi		$t4, $t1, 48			#Subtract by 48
-	bgt 		$t4, 9, reset			#If Greater than 9 not valid
-	blt 		$t4, 0, reset			#If less than 0 not valid
-	
-	#CONVERT
-	sub		$t3, $t1, 48			#Convert to binary 0-9
-	mul		$t0, $t0, 10			#Multiply $t0 by 10
-	add		$t0, $t0, $t3			#Add to dollars amount
-	
-	#INCREMENT
-	lb		$t1, 0($a0)			#Load byte of input
-	addiu		$a0, $a0, 1			#Next byte
-	j		parseLoop			#Loop
-	
-	#DOLLARS HAVE BEEN PARSED
-	parseLoopBreak:
-	mul		$t0, $t0, 100			#Convert num to dollars
-	
-	#PARSE DECIMAL
-	bne 		$t1, 0x2E, parseDone		#If last char not decimal... Done
-	addiu		$a0, $a0, 1			#Next byte
-	lb		$t1, 0($a0)			#Load byte of input
-	sub		$t3, $t1, 48			#Convert to binary 0-9
-	mul		$t3, $t3, 10			#Multiply $t0 by 10
-	add		$t0, $t0, $t3			#Add to dollars amount
-	
-	#PENNIES
-	addiu		$a0, $a0, 1			#Next byte
-	lb		$t1, 0($a0)			#Load byte of input
-	sub		$t3, $t1, 48			#Convert to binary 0-9
-	bltz		$t3, parseDone			#If $t3 is less than 0 skip add
-	add		$t0, $t0, $t3			#Add to dollars amount
-
-	parseDone:
-	sw		$t0, ($a1)			#Store word
-	jr		$ra				#Return
-	
-	#INVALID INPUT
-	reset:
-	#PRINT STRING
-	li		$v0, 4				#Load print string syscall
-	la		$a0, ($a2)			#Load invalidInputString
-	syscall						#Execute
-	
-	j		main				#Reset
 	
 # HexAscii to Binary
 # $a0 = pointer to an input asciiz digit string
