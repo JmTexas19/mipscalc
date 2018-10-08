@@ -29,6 +29,9 @@
 .text
 #MAIN
 main:
+	#LOAD STACK
+	la      $sp, stack_end				#Load stack into sp register
+
 	#GETINPUT1
 	la		$a0, inputString1		#Load pointer inputString1 into $a0
 	la		$a1, buffer1			#Load pointer input1 into $a1
@@ -123,6 +126,11 @@ main:
 	la		$a0, divisionByNegStr		#Load in divisionByNegStr string
 	syscall						#Execute
 	j		main				#Loop Program
+	
+#EXIT	
+ExitPrgm:
+        li      	$v0, 10				#Load exit system call
+        syscall						#Execute
 	
 #Procedure:  GetInput
 #Displays a prompt to the user and then wait for a numerical input
