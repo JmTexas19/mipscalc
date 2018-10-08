@@ -2,20 +2,19 @@
 #September 23, 2018
 #MIPS CALCULATOR
 
+.data	.align 2
+	#Variables
+	input1:			.word 0, 0, 0, 0
+	input2:			.word 0, 0, 0, 0
+	result:			.word 0, 0, 0, 0
+	remainder:		.word 0, 0, 0, 0
+	
 .data
 	#Stack
 	stack_beg:
        				.word   0 : 40
 	stack_end:
 
-	#Variables
-	buffer1:		.byte 0:80
-	buffer2:		.byte 0:80
-	input1:			.word 0
-	input2:			.word 0
-	result:			.word 0
-	remainder:		.word 0
-	
 	#Strings
 	inputString1:		.asciiz "Enter first value:\n"
 	inputString2:		.asciiz "Enter second value:\n"
@@ -49,7 +48,7 @@ main:
 	
 	#GETINPUT2
 	la		$a0, inputString2		#Load pointer inputString2 into $a0
-	la		$a1, buffer2			#Load pointer input2 into $a1
+	la		$a1, input2			#Load pointer input2 into $a1
 	jal 		getInput			#Jump to procedure printInputStr1
 	
 	#LOAD ARGUMENTS AND RETURN REGISTER
@@ -77,12 +76,16 @@ main:
 	#DISPLAY RESULT
 	la		$a0, resultString		#Load address of resultString into $a0
 	la		$a1, result			#Load address of result into $a1
-	la		$a2, remainder			#Load address of remainder into $a2
 	jal		displayNumb			#Jump and link to displayNumb
 	
 	#DISPLAY REMAINDER IF NECESSARY
 	move		$t0, $s0			#Load operator value into $t0
 	bne   		$t0, 47, skipRemainder		#Branch if division operator was used
+	
+	#DISPLAY REMAINDER
+	la		$a0, remainderString		#Load address of resultString into $a0
+	la		$a1, remainder			#Load address of result into $a1
+	jal		displayNumb			#Jump and link to displayNumb
 	
 	#If not division, remainder is skipped
 	skipRemainder:
@@ -131,19 +134,22 @@ getInput:
 	li		$v0, 4				#Load print string syscall
 	syscall						#Execute
 	
-	#SAVE
-	move		$t0, $a1			#Save pointer to word address
-	
 	#READ INPUT
 	li		$v0, 8				#Load read string input
-	li		$a1, 80				#80 bytes of space
 	syscall						#Execute
 	
-	#CONVERT
-	move		$a1, $t0			#Put back in
-	j		DecAscToBin			#Jump to convert ascii to binary
+	#SAVE RETURN TO STACK
+	addi $sp, $sp, -4				#Subtract 4 to stack to prevent loss of memory
+   	sw $ra, 0($sp)   				#Saves #ra on stack
 	
-	jr		$ra
+	#CONVERT
+	jal		DecAscToBin			#Jump to convert ascii to binary
+	
+	#LOAD RETURN FROM STACK
+   	lw $ra, 0($sp)   				#Loads $ra on stack
+	addi $sp, $sp, 4				#Add 4 to stack to prevent loss of memory
+	
+	jr		$ra				#Return
 	
 #Procedure:  GetOperator
 #Displays a prompt to the user and then wait for a single character input
@@ -623,32 +629,33 @@ _Sqrt5:
 #Displays a message to the user followed by a numerical value
 #Input: $a0 points to the text string that will get displayed to the user
 #Input: $a1 points to a word address in .data memory, where the result value is stored
-#Input: $a2 points to a word address in .data memory, where the remainder value is stored
 displayNumb:
+	#COUNTER
+	li		$t0, 0	
+
 	#PRINT STRING
 	li		$v0, 4				#Load print string syscall
 	syscall						#Execute
 	
-	move		$t1, $a1			#Copy result
-	move		$t2, $a2			#Copy remainder
+	#SAVE RETURN TO STACK
+	addi $sp, $sp, -4				#Subtract 4 to stack to prevent loss of memory
+   	sw $ra, 0($sp)   				#Saves #ra on stack
 	
 	#CONVERT RESULT BINARY
-	move		$a0, $t1			#Load input to be converted
+	move		$a0, $a1			#Load pointer of result to be converted
+	la		$a1, stack_end 			#Load pointer of result buffer for holding string
 	jal		BinToDecAsc			#Convert
+		
+	#LOAD RETURN FROM STACK
+   	lw $ra, 0($sp)   				#Loads $ra on stack
+	addi $sp, $sp, 4				#Add 4 to stack to prevent loss of memory
 	
 	#PRINT RESULT
 	move		$a0, $a1			#Copy result into $a0
 	li		$v0, 4				#Load print string syscall
 	syscall						#Execute
 	
-	#PRINT REMAINDER
-	#STRING
-	bne 		$s0, 47, skipRemainder		#If not division skip remainder
-	la		$a0, remainderString		#Load value of remainder into $a0
-	li		$v0, 4				#Load print character syscall
-	syscall						#Execute
-	
-	jr		$ra				#Return to main
+	jr		$ra				#Return
 	
 # HexAscii to Binary
 # $a0 = pointer to an input asciiz digit string
