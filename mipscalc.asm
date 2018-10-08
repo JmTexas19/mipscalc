@@ -8,7 +8,7 @@
 	input2:			.word 0, 0, 0, 0
 	result:			.word 0, 0, 0, 0
 	remainder:		.word 0, 0, 0, 0
-	buffer:			.asciiz ""
+	buffer:			.byte 80
 .data
 	#Stack
 	stack_beg:
@@ -46,6 +46,9 @@ main:
 	addi		$a0, $0, 0xA			#Load ascii character for newline into $a0
 	syscall						#Execute
 	
+	#CHECK IF SQUARE ROOT
+	beq		$s0, 36, squareRoot
+	
 	#GETINPUT2
 	la		$a0, inputString2		#Load pointer inputString2 into $a0
 	la		$a1, input2			#Load pointer input2 into $a1
@@ -63,6 +66,8 @@ main:
 	beq		$v1, 45, SubNumb		#Branch if $v1 is a '-' operator
 	beq		$v1, 42, MultNumb		#Branch if $v1 is a '*' operator
 	beq		$v1, 47, DivNumb		#Branch if $v1 is a '/' operator
+	beq		$v1, 36, squareRoot		#Branch if $v1 is a '$' operator
+	beq		$v1, 37, DivNumb		#Branch if $v1 is a '%' operator
 
 	#INVALID OPERATOR 
 	li		$v0, 4				#Load print string syscall
@@ -70,28 +75,31 @@ main:
 	syscall						#Execute
 	j		main				#Loop to start of program
 	
+	#GET SQUARE ROOT RESULT
+	squareRoot:
+	lw		$a0, input1			#Load value of input1 into $a0
+	sw		$a0, result			#Store word of input1 into result
+	la		$a0, result			#Load address of result into $a0
+	la		$ra, continue			#Make return register return to continue label
+	j		SquareRoot			#Jump to SquareRoot Procedure
+	
 	#CONTINUE
 	continue:
 	
-	#DISPLAY RESULT
+	#LOAD VALUES
 	la		$a0, resultString		#Load address of resultString into $a0
 	la		$a1, result			#Load address of result into $a1
-	jal		displayNumb			#Jump and link to displayNumb
 	
-	#DISPLAY REMAINDER IF NECESSARY
-	move		$t0, $s0			#Load operator value into $t0
-	bne   		$t0, 47, skipRemainder		#Branch if division operator was used
+	#CHECK IF MODULO
+	bne  		$s0, 37, printResult		#Checks if modulo
+	la		$a1, remainder			#Load address of remainder into $a1
+	 
+	#DISPLAY RESULT
+	printResult:
+	jal		displayNumb			#Jump and link to displayNumb
 	
 	#LOAD STACK
 	la      $sp, stack_end				#Load stack into sp register
-	
-	#DISPLAY REMAINDER
-	la		$a0, remainderString		#Load address of resultString into $a0
-	la		$a1, remainder			#Load address of result into $a1
-	jal		displayNumb			#Jump and link to displayNumb
-	
-	#If not division, remainder is skipped
-	skipRemainder:
 	
 	#PRINT NEWLINE
 	li		$v0, 11				#Load print character syscall
@@ -140,7 +148,7 @@ getInput:
 	#READ INPUT
 	move		$t0, $a1			#Save pointer
 	li		$v0, 8				#Load read string input
-	li		$a1, 33
+	li		$a1, 80
 	syscall						#Execute
 	move		$a1, $t0			#Reload pointer
 	
@@ -636,9 +644,6 @@ _Sqrt5:
 #Input: $a0 points to the text string that will get displayed to the user
 #Input: $a1 points to a word address in .data memory, where the result value is stored
 displayNumb:
-	#COUNTER
-	li		$t0, 0	
-
 	#PRINT STRING
 	li		$v0, 4				#Load print string syscall
 	syscall						#Execute
@@ -650,10 +655,10 @@ displayNumb:
 	#PROBLEM HERE#
 	#########################
 	# $a0 = pointer to result 
-	# $a1 = stack_beg 
+	# $a1 = buffer 
 	#
 	# When using a normal string for $a1, all that prints is a square
-	# Using the stack should print the correct result, but something is overwritten and skips over PRINT RESULT
+	# Using the buffer should print the correct result, but something is overwritten and skips over PRINT RESULT
 	#########################
 	
 	#CONVERT RESULT BINARY
