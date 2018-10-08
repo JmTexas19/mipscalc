@@ -34,7 +34,7 @@ main:
 
 	#GETINPUT1
 	la		$a0, inputString1		#Load pointer inputString1 into $a0
-	la		$a1, buffer1			#Load pointer input1 into $a1
+	la		$a1, input1			#Load pointer input1 into $a1
 	jal 		getInput			#Jump to procedure printInputStr1
 	
 	#GET OPERATOR
@@ -51,11 +51,6 @@ main:
 	la		$a0, inputString2		#Load pointer inputString2 into $a0
 	la		$a1, buffer2			#Load pointer input2 into $a1
 	jal 		getInput			#Jump to procedure printInputStr1
-	
-	#PARSEINPUT2
-	la		$a0, buffer2			#Load pointer inputString1 into $a0
-	la		$a1, input2			#Load pointer input1 into $a1
-	jal 		parseString			#Jump to procedure printInputStr1
 	
 	#LOAD ARGUMENTS AND RETURN REGISTER
 	la		$a0, input1			#Load address of input1 into $a0
@@ -141,12 +136,14 @@ getInput:
 	
 	#READ INPUT
 	li		$v0, 8				#Load read string input
-	la		$a0, ($a1)			#Load word address of buffer
 	li		$a1, 80				#80 bytes of space
 	syscall						#Execute
 	
+	#CONVERT
 	move		$a1, $t0			#Put back in
 	j		DecAscToBin			#Jump to convert ascii to binary
+	
+	jr		$ra
 	
 #Procedure:  GetOperator
 #Displays a prompt to the user and then wait for a single character input
@@ -628,76 +625,20 @@ _Sqrt5:
 #Input: $a1 points to a word address in .data memory, where the result value is stored
 #Input: $a2 points to a word address in .data memory, where the remainder value is stored
 displayNumb:
-	lw		$t0, ($a1)			#Load result
-	lw		$t4, ($a2)			#Load remainder
-	
 	#PRINT STRING
 	li		$v0, 4				#Load print string syscall
 	syscall						#Execute
 	
-	#FIX DECIMAL FOR MULTIPLICATION
-	bne		$s0, 42, skipToDiv		#Branch if $v1 is a '*' operator
-	div		$t1, $t0, 10000			#Divide result by 100 to get dollars
-	rem		$t2, $t0, 10000			#Modulo to get cents
+	move		$t1, $a1			#Copy result
+	move		$t2, $a2			#Copy remainder
 	
-	#FIX CENTS
-	div		$t2, $t2, 100			#Decimal Correction
-	div		$t3, $t2, 10			#Get dimes by dividing cents by 10
-	rem		$t4, $t2, 10			#Get pennies by dividing cents by 10S
-	j		printNumb			#Jump to printing
+	#CONVERT RESULT BINARY
+	move		$a0, $t1			#Load input to be converted
+	jal		BinToDecAsc			#Convert
 	
-	#OR DIVISION
-	skipToDiv:
-	bne		$s0, 47, skipToAddSub		#Branch if $v1 is a '/' operator
-	div		$t1, $t0, 100			#Divide result by 100 to get dollars
-	rem		$t2, $t0, 100			#Modulo to get cents
-	
-	#FIX REMAINDER
-	div		$t5, $t4, 100			#Fix remainder value get dollars
-	rem		$t6, $t4, 100			#Modulo to get cents
-	
-	#FIX CENTS
-	div		$t3, $t2, 10			#Get dimes by dividing cents by 10
-	rem		$t4, $t2, 10			#Get pennies by dividing cents by 10
-	rem		$t7, $t6, 10			#Get pennies by dividing cents by 10 for remainder
-	div		$t6, $t6, 10			#Get dimes by dividing cents by 10 for remainder
-	j		printNumb			#Jump to printing
-	
-	#GET DOLLARS AND CENTS
-	skipToAddSub:					#Skip if not division
-	div		$t1, $t0, 100			#Divide result by 100 to get dollars
-	rem		$t2, $t0, 100			#Modulo to get cents
-	div		$t3, $t2, 10			#Get dimes by dividing cents by 10
-	rem		$t4, $t2, 10			#Get pennies by dividing cents by 10
-	
-	printNumb:
-	#PRINT DOLLARS
-	li		$v0, 1				#Load print integer syscall
-	move		$a0, $t1			#Copy value of $t0 into $a0 for printing
-	syscall						#Execute
-
-	#PRINT DECIMAL
-	li		$v0, 11				#Load print integer syscall
-	addi		$a0, $0, 0x2E			#Copy ascii for decimal
-	syscall						#Execute
-	
-	#FIX CENTS
-	abs		$t3, $t3			#Make positive so negative sign isn't print
-	abs		$t4, $t4			#Make positive so negative sign isn't print
-	
-	#PRINT DIMES
-	li		$v0, 1				#Load print integer syscall
-	move		$a0, $t3			#Copy value of $t3 into $a0 for printing
-	syscall						#Execute
-	
-	#PRINT PENNIES
-	li		$v0, 1				#Load print integer syscall
-	move		$a0, $t4			#Copy value of $t4 into $a0 for printing
-	syscall						#Execute
-	
-	#PRINT NEWLINE
-	li		$v0, 11				#Load print character syscall
-	addi		$a0, $0, 0xA			#Load ascii character for newline into $a0
+	#PRINT RESULT
+	move		$a0, $a1			#Copy result into $a0
+	li		$v0, 4				#Load print string syscall
 	syscall						#Execute
 	
 	#PRINT REMAINDER
@@ -705,32 +646,6 @@ displayNumb:
 	bne 		$s0, 47, skipRemainder		#If not division skip remainder
 	la		$a0, remainderString		#Load value of remainder into $a0
 	li		$v0, 4				#Load print character syscall
-	syscall						#Execute
-	
-	#PRINT DOLLARS
-	li		$v0, 1				#Load print integer syscall
-	move		$a0, $t5			#Copy value of $t0 into $a0 for printing
-	syscall						#Execute
-	
-	#PRINT DECIMAL
-	li		$v0, 11				#Load print integer syscall
-	addi		$a0, $0, 0x2E			#Copy ascii for decimal
-	syscall						#Execute
-	
-	#PRINT DIMES
-	li		$v0, 1				#Load print integer syscall
-	move		$a0, $t6			#Copy value of $t3 into $a0 for printing
-	syscall						#Execute
-	
-	#PRINT PENNIES
-	li		$v0, 1				#Load print integer syscall
-	move		$a0, $t7			#Copy value of $t4 into $a0 for printing
-	syscall						#Execute
-	
-	skipPrintRemainder:
-	#PRINT NEWLINE
-	li		$v0, 11				#Load print character syscall
-	addi		$a0, $0, 0xA			#Load ascii character for newline into $a0
 	syscall						#Execute
 	
 	jr		$ra				#Return to main
