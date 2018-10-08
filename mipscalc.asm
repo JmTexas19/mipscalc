@@ -147,6 +147,7 @@ getInput:
 	
 	#READ INPUT
 	move		$t0, $a1			#Save pointer
+	la		$a0, buffer			#Buffer for reading string
 	li		$v0, 8				#Load read string input
 	li		$a1, 80
 	syscall						#Execute
