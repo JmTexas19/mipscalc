@@ -3,6 +3,11 @@
 #MIPS CALCULATOR
 
 .data
+	#Stack
+	stack_beg:
+       				.word   0 : 40
+	stack_end:
+
 	#Variables
 	buffer1:		.byte 0:80
 	buffer2:		.byte 0:80
